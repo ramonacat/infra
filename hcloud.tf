@@ -30,6 +30,7 @@ resource "hcloud_ssh_key" "ramona" {
 
 resource "hcloud_server" "node1" {
     name = "node1"
+    image = "ubuntu-22.04"
     server_type = "cax11"
     ssh_keys = [ hcloud_ssh_key.ramona.id ]
     user_data = "#cloud-config\nruncmd:\n- curl https://raw.githubusercontent.com/elitak/nixos-infect/master/nixos-infect | PROVIDER=hetznercloud NIX_CHANNEL=nixos-unstable bash 2>&1 | tee /tmp/infect.log\n"
