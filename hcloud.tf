@@ -50,7 +50,7 @@ resource "hcloud_server" "jump" {
 
     network {
         network_id = hcloud_network.mainnet.id
-        ip = "10.69.100.1"
+        ip = "10.69.100.5"
     }
 
     depends_on = [
@@ -60,9 +60,9 @@ resource "hcloud_server" "jump" {
 
 locals {
     k8s-nodes = {
-        node0 = { ip = "10.69.100.2" },
-        node1 = { ip = "10.69.100.3" },
-        node2 = { ip = "10.69.100.4" },
+        node0 = { ip = "10.69.100.20" },
+        node1 = { ip = "10.69.100.21" },
+        node2 = { ip = "10.69.100.22" },
     }
 }
 
