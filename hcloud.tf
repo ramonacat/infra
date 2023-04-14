@@ -89,3 +89,7 @@ resource "hcloud_server" "nodes" {
       hcloud_network_subnet.mainnet-subnet0
     ]
 }
+
+output "jump_ip" {
+  value = hcloud_server.jump.ipv4_address
+}
