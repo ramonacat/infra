@@ -42,7 +42,7 @@ resource "hcloud_network_subnet" "mainnet-subnet0" {
 
 resource "hcloud_server" "jump" {
     name = "jump"
-    location = "nbg1"
+    location = "fsn1"
     image = "ubuntu-22.04"
     server_type = "cax11"
     ssh_keys = [ hcloud_ssh_key.ramona.id ]
@@ -69,7 +69,7 @@ locals {
 resource "hcloud_server" "nodes" {
     for_each = local.k8s-nodes
     name = each.key
-    location = "nbg1"
+    location = "fsn1"
     image = "ubuntu-22.04"
     server_type = "cax11"
     ssh_keys = [ hcloud_ssh_key.ramona.id ]
