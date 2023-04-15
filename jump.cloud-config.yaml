@@ -5,9 +5,13 @@ write_files:
         systemd.services.network-addresses-enp7s0 = { after = [ "dhcpcd.service" ]; };
         networking = {
           interfaces.enp7s0 = {
+            useDHCP = false;
             ipv4 = {
               addresses = [ { address = "${ip}"; prefixLength = 24; } ];
-              routes = [ { address = "10.69.100.0"; via="10.69.100.1"; prefixLength = 24; } ];
+              routes = [ 
+                { address = "10.69.100.1"; prefixLength = 32; } 
+                { address = "10.69.100.0"; via="10.69.100.1"; prefixLength = 24; } 
+              ];
             };
           };
         };
