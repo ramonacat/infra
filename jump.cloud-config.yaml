@@ -2,6 +2,7 @@
 write_files:
   - content: |
       { lib, ... }: {
+        systemd.services.network-addresses-enp7s0 = { after = [ "dhcpcd.service" ]; };
         networking = {
           interfaces.enp7s0 = {
             ipv4 = {

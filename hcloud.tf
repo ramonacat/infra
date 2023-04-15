@@ -33,12 +33,6 @@ resource "hcloud_network" "mainnet" {
     ip_range = "10.69.100.0/24"
 }
 
-resource "hcloud_network_route" "world" {
-    network_id = hcloud_network.mainnet.id
-    destination = "0.0.0.0/0"
-    gateway = "10.69.100.1"
-}
-
 resource "hcloud_network_subnet" "mainnet-subnet0" {
     network_id = hcloud_network.mainnet.id
     type = "cloud"
