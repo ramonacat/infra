@@ -1,0 +1,16 @@
+ #cloud-config
+ runcmd:
+  - curl https://raw.githubusercontent.com/elitak/nixos-infect/master/nixos-infect | NIXOS_IMPORT=/etc/nixos/host.nix PROVIDER=hetznercloud NIX_CHANNEL=nixos-unstable bash 2>&1 | tee /tmp/infect.log\n
+write_files:
+  - content: |
+      { lib, ... }: {
+        networking = {
+          interfaces.enp7s0 = {
+            ipv4 = {
+              addresses = [ { address = "${ip}"; prefixLength = 24; } ];
+              routes = [ { address = "10.69.100.0"; prefixLength = 24; } ];
+            };
+          };
+        };
+      }
+    path: /etc/nixos/host.nix

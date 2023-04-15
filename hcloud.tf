@@ -46,7 +46,7 @@ resource "hcloud_server" "jump" {
     image = "ubuntu-22.04"
     server_type = "cax11"
     ssh_keys = [ hcloud_ssh_key.ramona.id ]
-    user_data = "#cloud-config\nruncmd:\n- curl https://raw.githubusercontent.com/elitak/nixos-infect/master/nixos-infect | PROVIDER=hetznercloud NIX_CHANNEL=nixos-unstable bash 2>&1 | tee /tmp/infect.log\n"
+    user_data = templatefile("nodes.cloud-config.yaml", { ip = "10.69.100.5" })
 
     network {
         network_id = hcloud_network.mainnet.id
@@ -73,7 +73,7 @@ resource "hcloud_server" "nodes" {
     image = "ubuntu-22.04"
     server_type = "cax11"
     ssh_keys = [ hcloud_ssh_key.ramona.id ]
-    user_data = "#cloud-config\nruncmd:\n- curl https://raw.githubusercontent.com/elitak/nixos-infect/master/nixos-infect | PROVIDER=hetznercloud NIX_CHANNEL=nixos-unstable bash 2>&1 | tee /tmp/infect.log\n"
+    user_data = templatefile("nodes.cloud-config.yaml", { ip = each.value.ip })
 
     public_net {
       ipv4_enabled = false
