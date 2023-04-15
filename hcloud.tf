@@ -46,7 +46,7 @@ resource "hcloud_server" "jump" {
     image = "ubuntu-22.04"
     server_type = "cax11"
     ssh_keys = [ hcloud_ssh_key.ramona.id ]
-    user_data = templatefile("nodes.cloud-config.yaml", { ip = "10.69.100.5" })
+    user_data = templatefile("jump.cloud-config.yaml", { ip = "10.69.100.5" })
 
     network {
         network_id = hcloud_network.mainnet.id

@@ -3,7 +3,7 @@ write_files:
   - content: |
       { lib, ... }: {
         networking = {
-          interfaces.eth0 = {
+          interfaces.enp7s0 = {
             ipv4 = {
               addresses = [ { address = "${ip}"; prefixLength = 24; } ];
               routes = [ { address = "10.69.100.0"; prefixLength = 24; } ];
