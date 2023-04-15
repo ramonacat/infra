@@ -2,17 +2,11 @@
 write_files:
   - content: |
       { lib, ... }: {
-        systemd.services.network-addresses-enp7s0 = { after = [ "dhcpcd.service" ]; };
         networking = {
+          dhcpcd.enable = lib.mkForce true;
+
           interfaces.enp7s0 = {
-            useDHCP = false;
-            ipv4 = {
-              addresses = [ { address = "${ip}"; prefixLength = 24; } ];
-              routes = [ 
-                { address = "10.69.100.1"; prefixLength = 32; } 
-                { address = "10.69.100.0"; via="10.69.100.1"; prefixLength = 24; } 
-              ];
-            };
+            useDHCP = true;
           };
         };
       }
