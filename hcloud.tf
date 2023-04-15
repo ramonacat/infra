@@ -83,7 +83,7 @@ resource "hcloud_server" "nodes" {
 
     public_net {
       ipv4_enabled = false
-      ipv6_enabled = false
+      ipv6_enabled = true
     }
 
     network {
