@@ -4,7 +4,10 @@ write_files:
       { lib, ... }: {
         networking = {
           interfaces.enp7s0 = {
-            useDHCP = true;
+            ipv4 = {
+              addresses = [ { address = "${ip}"; prefixLength = 24; } ];
+              routes = [ { address = "10.69.100.0"; via="10.69.100.1"; prefixLength = 24; } ];
+            };
           };
         };
       }
