@@ -28,9 +28,9 @@ terraform {
 
 provider "ovh" {
   endpoint           = "ovh-eu"
-  application_key    = "xxxxxxxxx"
-  application_secret = "yyyyyyyyy"
-  consumer_key       = "zzzzzzzzzzzzzz"
+  application_key    = "${var.ovh_application_key}"
+  application_secret = "${var.ovh_application_secret}"
+  consumer_key       = "${var.ovh_consumer_key}"
 }
 
 provider "hcloud" {
