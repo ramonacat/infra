@@ -120,6 +120,6 @@ resource "ovh_domain_zone_record" "jump-ramona-fun-aaaa" {
     target = hcloud_server.jump.ipv6_address
 }
 
-output "jump_ip" {
-  value = hcloud_server.jump.ipv4_address
+output "node_ips" {
+    value = values(local.k8s-nodes).*.ip
 }
