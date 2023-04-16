@@ -1,7 +1,7 @@
 name: build
 on:
-  workflow_run:
-    workflows: ["Terraform Cloud/ramona/infra"]
+  check_run:
+    checks: ["Terraform Cloud/ramona/infra"]
     # branches: [main]
     types:
       - completed
