@@ -5,6 +5,8 @@ jobs:
   deploy:
     runs-on: ubuntu-22.04
     if: github.event.state == 'success'
+    env:
+      TF_TOKEN_APP_TERRAFORM_IO: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
