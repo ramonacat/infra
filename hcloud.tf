@@ -1,4 +1,7 @@
 variable "hcloud_token" {}
+variable "ovh_application_key" {}
+variable "ovh_application_secret" {}
+variable "ovh_consumer_key" {}
 
 terraform {
     backend "remote" {
@@ -15,8 +18,19 @@ terraform {
     hcloud = {
       source = "hetznercloud/hcloud"
     }
+    ovh = {
+      source = "ovh/ovh"
+      version = "0.29.0"
+    }
   }
   required_version = ">= 0.13"
+}
+
+provider "ovh" {
+  endpoint           = "ovh-eu"
+  application_key    = "xxxxxxxxx"
+  application_secret = "yyyyyyyyy"
+  consumer_key       = "zzzzzzzzzzzzzz"
 }
 
 provider "hcloud" {
@@ -88,6 +102,22 @@ resource "hcloud_server" "nodes" {
     depends_on = [
       hcloud_network_subnet.mainnet-subnet0
     ]
+}
+
+resource "ovh_domain_zone_record" "jump-ramona-fun-a" {
+    zone = "ramona.fun"
+    subdomain = "jump"
+    fieldtype = "A"
+    ttl = 60
+    target = hcloud_server.jump.ipv4_address
+}
+
+resource "ovh_domain_zone_record" "jump-ramona-fun-aaaa" {
+    zone = "ramona.fun"
+    subdomain = "jump"
+    fieldtype = "AAAA"
+    ttl = 60
+    target = hcloud_server.jump.ipv6_address
 }
 
 output "jump_ip" {
