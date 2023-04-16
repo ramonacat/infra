@@ -1,11 +1,8 @@
 name: build
 on:
-  check_suite:
-    action:  completed
-    check_suite:
-    conclusion: success
-    app:
-      name: "Terraform Cloud"
+  check_run:
+    types: [completed]
+    # todo: name
 jobs:
   deploy:
     runs-on: ubuntu-22.04
