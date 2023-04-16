@@ -1,6 +1,7 @@
 name: build
 on:
-  status: success
+  status: 
+    state: success
 jobs:
   deploy:
     runs-on: ubuntu-22.04
