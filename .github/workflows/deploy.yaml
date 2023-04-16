@@ -1,7 +1,6 @@
 name: build
 on:
-  status: 
-    state: success
+  workflow_run: ~
 jobs:
   deploy:
     runs-on: ubuntu-22.04
