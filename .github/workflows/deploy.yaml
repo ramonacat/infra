@@ -1,14 +1,15 @@
 name: build
 on:
-  workflow_run:
-    workflows: ["Terraform Cloud/ramona/infra"]
-    # branches: [main]
-    types:
-      - completed
+  check_run: ~
 jobs:
   deploy:
     runs-on: ubuntu-22.04
-    steps:
+    steps:      
+      - env:
+          EVENT_CONTEXT: ${{ toJSON(github.event) }}
+        run: |
+          echo $EVENT_CONTEXT
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
