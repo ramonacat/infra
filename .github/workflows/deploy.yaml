@@ -1,10 +1,11 @@
 name: build
 on:
-  check_run:
-    checks: ["Terraform Cloud/ramona/infra"]
-    # branches: [main]
-    types:
-      - completed
+  check_suite:
+    action:  completed
+    check_suite:
+    conclusion: success
+    app:
+      name: "Terraform Cloud"
 jobs:
   deploy:
     runs-on: ubuntu-22.04
