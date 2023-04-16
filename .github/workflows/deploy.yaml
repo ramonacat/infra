@@ -1,16 +1,11 @@
 name: build
 on:
-  status:
-    state: success
+  status: ~
 jobs:
   deploy:
     runs-on: ubuntu-22.04
-    steps:      
-      - env:
-          EVENT_CONTEXT: ${{ toJSON(github.event) }}
-        run: |
-          echo $EVENT_CONTEXT
-
+    if: github.event.state == 'success'
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
