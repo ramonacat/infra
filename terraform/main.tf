@@ -56,7 +56,7 @@ provider "vultr" {
 
 provider "flux" {
   kubernetes = {
-    host = vultr_kubernetes.k8s.ip
+    endpoint = vultr_kubernetes.k8s.endpoint
     client_certificate = base64decode(vultr_kubernetes.k8s.client_certificate)
     client_key = base64decode(vultr_kubernetes.k8s.client_key)
     cluster_ca_certificate = base64decode(vultr_kubernetes.k8s.cluster_ca_certificate)
