@@ -62,10 +62,10 @@ provider "flux" {
     cluster_ca_certificate = vultr_kubernetes.k8s.cluster_ca_certificate
   }
   git = {
-    url  = "git@github.com:Agares/infra.git"
+    url  = "ssh://git@github.com/Agares/infra.git"
     ssh = {
       username    = "git"
-      private_key = var.private_key_pem
+      private_key = tls_private_key.flux.private_key_pem
     }
   }
 }
@@ -82,7 +82,7 @@ resource "tls_private_key" "flux" {
 
 resource "github_repository_deploy_key" "this" {
   title      = "Flux"
-  repository = "git@github.com:Agares/infra.git"
+  repository = "infra"
   key        = tls_private_key.flux.public_key_openssh
   read_only  = "false"
 }
