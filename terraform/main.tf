@@ -90,7 +90,7 @@ resource "github_repository_deploy_key" "this" {
 resource "vultr_kubernetes" "k8s" {
   region="ewr"
   label="ramona-infra"
-  version="v1.27.1"
+  version="v1.26.2+2"
 
   node_pools {
     node_quantity = 2
