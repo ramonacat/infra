@@ -6,13 +6,13 @@ variable "vultr_api_key" {}
 variable "github_token" {}
 
 terraform {
-    backend "remote" {
-        organization = "ramona"
+  backend "remote" {
+    organization = "ramona"
 
-        workspaces {
-            name = "infra"
-        }
+    workspaces {
+      name = "infra"
     }
+  }
 }
 
 terraform {
@@ -21,11 +21,11 @@ terraform {
       source = "hetznercloud/hcloud"
     }
     ovh = {
-      source = "ovh/ovh"
+      source  = "ovh/ovh"
       version = "0.29.0"
     }
     vultr = {
-      source = "vultr/vultr"
+      source  = "vultr/vultr"
       version = "2.15.0"
     }
     flux = {
@@ -41,28 +41,28 @@ terraform {
 
 provider "ovh" {
   endpoint           = "ovh-eu"
-  application_key    = "${var.ovh_application_key}"
-  application_secret = "${var.ovh_application_secret}"
-  consumer_key       = "${var.ovh_consumer_key}"
+  application_key    = var.ovh_application_key
+  application_secret = var.ovh_application_secret
+  consumer_key       = var.ovh_consumer_key
 }
 
 provider "hcloud" {
-  token = "${var.hcloud_token}"
+  token = var.hcloud_token
 }
 
 provider "vultr" {
-  api_key = "${var.vultr_api_key}"
+  api_key = var.vultr_api_key
 }
 
 provider "flux" {
   kubernetes = {
-    endpoint = vultr_kubernetes.k8s.endpoint
-    client_certificate = base64decode(vultr_kubernetes.k8s.client_certificate)
-    client_key = base64decode(vultr_kubernetes.k8s.client_key)
+    host                   = kind_cluster.this.endpoint
+    client_certificate     = base64decode(vultr_kubernetes.k8s.client_certificate)
+    client_key             = base64decode(vultr_kubernetes.k8s.client_key)
     cluster_ca_certificate = base64decode(vultr_kubernetes.k8s.cluster_ca_certificate)
   }
   git = {
-    url  = "ssh://git@github.com/Agares/infra.git"
+    url = "ssh://git@github.com/Agares/infra.git"
     ssh = {
       username    = "git"
       private_key = tls_private_key.flux.private_key_pem
@@ -72,7 +72,7 @@ provider "flux" {
 
 provider "github" {
   owner = "Agares"
-  token = "${var.github_token}"
+  token = var.github_token
 }
 
 resource "tls_private_key" "flux" {
@@ -88,17 +88,17 @@ resource "github_repository_deploy_key" "this" {
 }
 
 resource "vultr_kubernetes" "k8s" {
-  region="ewr"
-  label="ramona-infra"
-  version="v1.26.2+2"
+  region  = "ewr"
+  label   = "ramona-infra"
+  version = "v1.26.2+2"
 
   node_pools {
     node_quantity = 2
-    plan = "vc2-1c-2gb"
-    label="main-nodes"
-    auto_scaler = true
-    min_nodes = 2
-    max_nodes = 3
+    plan          = "vc2-1c-2gb"
+    label         = "main-nodes"
+    auto_scaler   = true
+    min_nodes     = 2
+    max_nodes     = 3
   }
 }
 
