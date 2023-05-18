@@ -11,6 +11,7 @@
       '';
       packages = with nixpkgs.legacyPackages.x86_64-linux; [
         terraform
+        fluxcd
         rustup
       ];
     };
