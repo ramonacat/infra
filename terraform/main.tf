@@ -5,11 +5,6 @@ variable "ovh_consumer_key" {}
 variable "vultr_api_key" {}
 variable "github_token" {}
 
-module "kubernetes" {
-  source="./kubernetes/"
-  vultr_api_key = var.vultr_api_key
-}
-
 terraform {
   backend "remote" {
     organization = "ramona"
@@ -41,7 +36,7 @@ terraform {
       version = ">=5.18.0"
     }
     kubernetes = {
-      source = "hashicorp/kubernetes"
+      source  = "hashicorp/kubernetes"
       version = "2.20.0"
     }
   }
@@ -61,11 +56,10 @@ provider "hcloud" {
 
 provider "flux" {
   kubernetes = {
-    # config_path            = module.kubernetes.kubectl_config
-    host = module.kubernetes.cluster_endpoint
-    client_certificate     = base64decode(module.kubernetes.client_certificate)
-    client_key             = base64decode(module.kubernetes.client_key)
-    cluster_ca_certificate = base64decode(module.kubernetes.cluster_ca_certificate)
+    host                   = format("https://%s:6443", vultr_kubernetes.k8s.ip)
+    client_certificate     = base64decode(vultr_kubernetes.k8s.client_certificate)
+    client_key             = base64decode(vultr_kubernetes.k8s.client_key)
+    cluster_ca_certificate = base64decode(vultr_kubernetes.k8s.cluster_ca_certificate)
   }
   git = {
     url = "ssh://git@github.com/Agares/infra.git"
@@ -82,10 +76,14 @@ provider "github" {
 }
 
 provider "kubernetes" {
-  host = module.kubernetes.cluster_endpoint
-  client_key             = base64decode(module.kubernetes.client_key)
-  client_certificate     = base64decode(module.kubernetes.client_certificate)
-  cluster_ca_certificate = base64decode(module.kubernetes.cluster_ca_certificate)
+  host                   = format("https://%s:6443", vultr_kubernetes.k8s.ip)
+  client_key             = base64decode(vultr_kubernetes.k8s.client_key)
+  client_certificate     = base64decode(vultr_kubernetes.k8s.client_certificate)
+  cluster_ca_certificate = base64decode(vultr_kubernetes.k8s.cluster_ca_certificate)
+}
+
+provider "vultr" {
+  api_key = var.vultr_api_key
 }
 
 resource "tls_private_key" "flux" {
@@ -108,12 +106,28 @@ resource "flux_bootstrap_git" "this" {
 
 resource "kubernetes_secret" "ovh_credentials" {
   metadata {
-    name = "ovh-credentials"
+    name      = "ovh-credentials"
     namespace = "default"
   }
   data = {
-    OVH_APPLICATION_KEY = var.ovh_application_key
+    OVH_APPLICATION_KEY    = var.ovh_application_key
     OVH_APPLICATION_SECRET = var.ovh_application_secret
-    OVH_CONSUMER_KEY = var.ovh_consumer_key
+    OVH_CONSUMER_KEY       = var.ovh_consumer_key
+  }
+}
+
+
+resource "vultr_kubernetes" "k8s" {
+  region  = "ewr"
+  label   = "ramona-infra"
+  version = "v1.26.2+2"
+
+  node_pools {
+    node_quantity = 2
+    plan          = "vc2-1c-2gb"
+    label         = "main-nodes"
+    auto_scaler   = true
+    min_nodes     = 2
+    max_nodes     = 3
   }
 }
