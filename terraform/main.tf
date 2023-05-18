@@ -102,8 +102,8 @@ resource "vultr_kubernetes" "k8s" {
   }
 }
 
-resource "local_file" "kubectl_config" {
-  content = vultr_kubernetes.k8s.kube_config
+resource "local_sensitive_file" "kubectl_config" {
+  content_base64 = vultr_kubernetes.k8s.kube_config
   filename = "${path.module}/kube_config"
 }
 
