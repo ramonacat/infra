@@ -127,8 +127,8 @@ resource "kubernetes_secret" "ovh_credentials" {
     namespace = "default"
   }
   data = {
-    application_key = var.ovh_application_key
-    application_secret = var.ovh_application_secret
-    consumer_key = var.ovh_consumer_key
+    OVH_APPLICATION_KEY = var.ovh_application_key
+    OVH_APPLICATION_SECRET = var.ovh_application_secret
+    OVH_CONSUMER_KEY = var.ovh_consumer_key
   }
 }
