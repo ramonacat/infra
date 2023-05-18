@@ -5,6 +5,11 @@ variable "ovh_consumer_key" {}
 variable "vultr_api_key" {}
 variable "github_token" {}
 
+module "kubernetes" {
+  source="./kubernetes/"
+  vultr_api_key = var.vultr_api_key
+}
+
 terraform {
   backend "remote" {
     organization = "ramona"
@@ -54,16 +59,13 @@ provider "hcloud" {
   token = var.hcloud_token
 }
 
-provider "vultr" {
-  api_key = var.vultr_api_key
-}
-
 provider "flux" {
   kubernetes = {
-    config_path            = local_sensitive_file.kubectl_config.filename
-    client_certificate     = base64decode(vultr_kubernetes.k8s.client_certificate)
-    client_key             = base64decode(vultr_kubernetes.k8s.client_key)
-    cluster_ca_certificate = base64decode(vultr_kubernetes.k8s.cluster_ca_certificate)
+    # config_path            = module.kubernetes.kubectl_config
+    host = module.kubernetes.cluster_endpoint
+    client_certificate     = base64decode(module.kubernetes.client_certificate)
+    client_key             = base64decode(module.kubernetes.client_key)
+    cluster_ca_certificate = base64decode(module.kubernetes.cluster_ca_certificate)
   }
   git = {
     url = "ssh://git@github.com/Agares/infra.git"
@@ -80,7 +82,10 @@ provider "github" {
 }
 
 provider "kubernetes" {
-  config_path = local_sensitive_file.kubectl_config.filename
+  host = module.kubernetes.cluster_endpoint
+  client_key             = base64decode(module.kubernetes.client_key)
+  client_certificate     = base64decode(module.kubernetes.client_certificate)
+  cluster_ca_certificate = base64decode(module.kubernetes.cluster_ca_certificate)
 }
 
 resource "tls_private_key" "flux" {
@@ -93,26 +98,6 @@ resource "github_repository_deploy_key" "this" {
   repository = "infra"
   key        = tls_private_key.flux.public_key_openssh
   read_only  = "false"
-}
-
-resource "vultr_kubernetes" "k8s" {
-  region  = "ewr"
-  label   = "ramona-infra"
-  version = "v1.26.2+2"
-
-  node_pools {
-    node_quantity = 2
-    plan          = "vc2-1c-2gb"
-    label         = "main-nodes"
-    auto_scaler   = true
-    min_nodes     = 2
-    max_nodes     = 3
-  }
-}
-
-resource "local_sensitive_file" "kubectl_config" {
-  content_base64 = vultr_kubernetes.k8s.kube_config
-  filename = "${path.module}/kube_config"
 }
 
 resource "flux_bootstrap_git" "this" {
