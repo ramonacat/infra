@@ -35,6 +35,10 @@ terraform {
       source  = "integrations/github"
       version = ">=5.18.0"
     }
+    kubernetes = {
+      source = "hashicorp/kubernetes"
+      version = "2.20.0"
+    }
   }
   required_version = ">= 0.13"
 }
@@ -75,6 +79,10 @@ provider "github" {
   token = var.github_token
 }
 
+provider "kubernetes" {
+  config_path = local_sensitive_file.kubectl_config.filename
+}
+
 resource "tls_private_key" "flux" {
   algorithm   = "ECDSA"
   ecdsa_curve = "P256"
@@ -111,4 +119,16 @@ resource "flux_bootstrap_git" "this" {
   depends_on = [github_repository_deploy_key.this]
 
   path = "clusters/ramona"
+}
+
+resource "kubernetes_secret" "ovh_credentials" {
+  metadata {
+    name = "ovh-credentials"
+    namespace = "default"
+  }
+  data = {
+    application_key = var.ovh_application_key
+    application_secret = var.ovh_application_secret
+    consumer_key = var.ovh_consumer_key
+  }
 }
