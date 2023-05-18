@@ -56,7 +56,7 @@ provider "vultr" {
 
 provider "flux" {
   kubernetes = {
-    config_path            = local_file.kubectl_config.filename
+    config_path            = local_sensitive_file.kubectl_config.filename
     client_certificate     = base64decode(vultr_kubernetes.k8s.client_certificate)
     client_key             = base64decode(vultr_kubernetes.k8s.client_key)
     cluster_ca_certificate = base64decode(vultr_kubernetes.k8s.cluster_ca_certificate)
