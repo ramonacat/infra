@@ -56,7 +56,7 @@ provider "vultr" {
 
 provider "flux" {
   kubernetes = {
-    config_context         = base64decode(vultr_kubernetes.k8s.kube_config)
+    config_path            = local_file.kubectl_config.filename
     client_certificate     = base64decode(vultr_kubernetes.k8s.client_certificate)
     client_key             = base64decode(vultr_kubernetes.k8s.client_key)
     cluster_ca_certificate = base64decode(vultr_kubernetes.k8s.cluster_ca_certificate)
@@ -100,6 +100,11 @@ resource "vultr_kubernetes" "k8s" {
     min_nodes     = 2
     max_nodes     = 3
   }
+}
+
+resource "local_file" "kubectl_config" {
+  content = vultr_kubernetes.k8s.kube_config
+  filename = "${path.module}/kube_config"
 }
 
 resource "flux_bootstrap_git" "this" {
