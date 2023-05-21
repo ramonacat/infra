@@ -3,9 +3,6 @@ kind: Service
 metadata:
     name: whoami-service
     namespace: default
-    # annotations:
-      # service.beta.kubernetes.io/vultr-loadbalancer-protocol: "http"
-      # external-dns.alpha.kubernetes.io/hostname: ramona.fun
 spec:
     selector:
         name: whoami
