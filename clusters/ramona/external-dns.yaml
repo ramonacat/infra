@@ -67,7 +67,7 @@ spec:
             - name: secret-volume
               mountPath: /etc/secrets/google-credentials/
               readOnly: true
-          environment:
+          env:
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: "/etc/secrets/google-credentials/GOOGLE_CREDENTIALS"
       volumes:
