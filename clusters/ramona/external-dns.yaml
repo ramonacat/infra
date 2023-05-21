@@ -62,7 +62,7 @@ spec:
         image: registry.k8s.io/external-dns/external-dns:v0.13.4
         args:
         - --source=service
-        - --provider=ovh
+        - --provider=google
         envFrom:
           - secretRef: 
-              name: ovh-credentials
+              name: google-credentials
