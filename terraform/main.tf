@@ -4,6 +4,7 @@ variable "ovh_application_secret" {}
 variable "ovh_consumer_key" {}
 variable "vultr_api_key" {}
 variable "github_token" {}
+variable "google_credentials" {}
 
 terraform {
   backend "remote" {
@@ -118,6 +119,16 @@ resource "kubernetes_secret" "ovh_credentials" {
     OVH_APPLICATION_KEY    = var.ovh_application_key
     OVH_APPLICATION_SECRET = var.ovh_application_secret
     OVH_CONSUMER_KEY       = var.ovh_consumer_key
+  }
+}
+
+resource "kubernetes_secret" "google_credentials" {
+  metadata {
+    name      = "google-credentials"
+    namespace = "default"
+  }
+  data = {
+    GOOGLE_CREDENTIALS = var.google_credentials
   }
 }
 
