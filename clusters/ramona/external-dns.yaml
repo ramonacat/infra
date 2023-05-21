@@ -63,6 +63,8 @@ spec:
           args:
             - --source=service
             - --provider=google
+            - --google-zone-visibility=public
+            - --registry=txt
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/secrets/google-credentials/
@@ -70,6 +72,8 @@ spec:
           env:
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: "/etc/secrets/google-credentials/GOOGLE_CREDENTIALS"
+            - name: GOOGLE_CLOUD_PROJECT
+              value: ramona-infra
       volumes:
         - name: secret-volume
           secret:
