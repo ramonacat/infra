@@ -86,6 +86,11 @@ provider "vultr" {
   api_key = var.vultr_api_key
 }
 
+provider "google" {
+  project     = "ramona-infra"
+  region      = "europe-west3"
+}
+
 resource "tls_private_key" "flux" {
   algorithm   = "ECDSA"
   ecdsa_curve = "P256"
@@ -116,7 +121,6 @@ resource "kubernetes_secret" "ovh_credentials" {
   }
 }
 
-
 resource "vultr_kubernetes" "k8s" {
   region  = "ewr"
   label   = "ramona-infra"
@@ -130,4 +134,9 @@ resource "vultr_kubernetes" "k8s" {
     min_nodes     = 2
     max_nodes     = 3
   }
+}
+
+resource "google_dns_managed_zone" "ramona-fun" {
+  name = "ramona-fun"
+  dns_name = "ramona.fun."
 }
