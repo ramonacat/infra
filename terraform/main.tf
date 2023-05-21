@@ -139,9 +139,18 @@ resource "vultr_kubernetes" "k8s" {
 resource "google_project_service" "dns" {
     project = "ramona-infra"
     service = "dns.googleapis.com"
+
+    depends_on = [ google_project_service.cloudresourcemanager ]
+}
+
+resource "google_project_service" "cloudresourcemanager" {
+    project = "ramona-infra"
+    service = "cloudresourcemanager.googleapis.com"
 }
 
 resource "google_dns_managed_zone" "ramona-fun" {
   name = "ramona-fun"
   dns_name = "ramona.fun."
+
+  depends_on = [ google_project_service.dns ]
 }
