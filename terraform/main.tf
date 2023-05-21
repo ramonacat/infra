@@ -136,6 +136,11 @@ resource "vultr_kubernetes" "k8s" {
   }
 }
 
+resource "google_project_service" "dns" {
+    project = "ramona-infra"
+    service = "dns.googleapis.com"
+}
+
 resource "google_dns_managed_zone" "ramona-fun" {
   name = "ramona-fun"
   dns_name = "ramona.fun."
