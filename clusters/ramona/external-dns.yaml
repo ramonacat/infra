@@ -62,6 +62,7 @@ spec:
           image: registry.k8s.io/external-dns/external-dns:v0.13.4
           args:
             - --source=service
+            - --source=ingress
             - --provider=google
             - --google-zone-visibility=public
             - --registry=txt
