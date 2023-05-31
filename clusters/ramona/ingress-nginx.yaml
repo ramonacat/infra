@@ -21,11 +21,12 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: nginx-ingress-2
-        namespace: flux-system
+        namespace: ingress-nginx
       interval: 1m
   values:
     replicaCount: 2
   install:
+    createNamespace: true 
     crds: CreateReplace
   upgrade:
     crds: CreateReplace
