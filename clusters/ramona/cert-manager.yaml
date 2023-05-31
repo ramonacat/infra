@@ -13,6 +13,7 @@ metadata:
   name: cert-manager-release
   namespace: default
 spec:
+  persistentClient: false
   interval: 5m
   install:
     crds: CreateReplace
