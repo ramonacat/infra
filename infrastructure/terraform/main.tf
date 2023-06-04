@@ -107,7 +107,7 @@ resource "github_repository_deploy_key" "this" {
 resource "flux_bootstrap_git" "this" {
   depends_on = [github_repository_deploy_key.this]
 
-  path = "clusters/ramona"
+  path = "infrastructure/clusters/ramona"
 }
 
 resource "kubernetes_secret" "ovh_credentials" {
