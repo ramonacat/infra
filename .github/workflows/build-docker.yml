@@ -10,4 +10,4 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
       - name: Build docker image
-        run: ./docker-build.sh backend:${{ github.ref }}-${date +%s}
+        run: ./docker-build.sh backend:${GITHUB_REF##*/}-${date +%s}
