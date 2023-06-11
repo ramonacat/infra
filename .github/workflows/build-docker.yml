@@ -15,7 +15,7 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@main
 
       - name: Generate docker image ID
-        run: echo image_id=${{ env.REGISTRY }}/backend:${GITHUB_REF##*/}-$(date +%s) >> "$GITHUB_ENV"
+        run: echo image_id=${{ env.REGISTRY }}/Agares/backend:${GITHUB_REF##*/}-$(date +%s) >> "$GITHUB_ENV"
 
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
