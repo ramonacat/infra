@@ -24,8 +24,7 @@ metadata:
   namespace: default
 spec:
   selector:
-    matchLabels:
-      app: backend
+    app: backend
   ports:
     - protocol: TCP
       port: 80
