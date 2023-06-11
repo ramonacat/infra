@@ -17,8 +17,18 @@ jobs:
       - name: Generate docker image ID
         run: echo image_id=${{ env.REGISTRY }}/backend:${GITHUB_REF##*/}-$(date +%s) >> "$GITHUB_ENV"
 
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build docker image
         run: "./docker-build.sh ${{ env.image_id }}"
 
       - name: Print image ID
         run: echo ${{ env.image_id }}
+
+      - name: Publish docker image
+        run: docker push ${{ env.image_id }}
