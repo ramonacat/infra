@@ -15,7 +15,7 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@main
 
       - name: Generate docker image ID
-        run: echo "image_id=${{ env.REGISTRY }}/backend:${GITHUB_REF##*/}-$(date +%s) >> "$GITHUB_ENV"
+        run: echo image_id=${{ env.REGISTRY }}/backend:${GITHUB_REF##*/}-$(date +%s) >> "$GITHUB_ENV"
 
       - name: Build docker image
         run: "./docker-build.sh ${{ env.image_id }}"
