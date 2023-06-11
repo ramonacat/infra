@@ -41,6 +41,9 @@
       name = "backend";
       config = {
         Cmd = [ "${backendPackage}/bin/backend" ];
+        Labels = {
+          "org.opencontainers.image.source" = "https://github.com/Agares/infra";
+        };
       };
     };
   };
