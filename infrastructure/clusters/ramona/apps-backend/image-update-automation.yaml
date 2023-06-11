@@ -20,5 +20,5 @@ spec:
     push:
       branch: main
   update:
-    path: ./infrastructure/clusters/ramona
+    path: ./infrastructure/clusters/ramona/apps-backend
     strategy: Setters
