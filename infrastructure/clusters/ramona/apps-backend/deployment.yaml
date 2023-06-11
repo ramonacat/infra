@@ -24,7 +24,8 @@ metadata:
   namespace: default
 spec:
   selector:
-    app.kubernetes.io/name: backend
+    matchLabels:
+      app: backend
   ports:
     - protocol: TCP
       port: 80
