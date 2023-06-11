@@ -16,7 +16,9 @@
       packages = with nixpkgs.legacyPackages.x86_64-linux; [
         terraform
         fluxcd
-        pkgs.rust-bin.stable.latest.default
+        (pkgs.rust-bin.stable.latest.default.override {
+          extensions = ["rust-src"];
+        })
       ];
     };
 
