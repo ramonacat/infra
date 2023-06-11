@@ -1,5 +1,8 @@
 name: Build docker images
-on: [push]
+on:
+  push:
+    paths:
+      - apps/backend/**
 env:
   REGISTRY: ghcr.io
 jobs:
