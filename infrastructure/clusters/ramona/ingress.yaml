@@ -18,10 +18,10 @@ spec:
     - host: ramona.fun
       http:
         paths:
-          - path: /
+          - path: /api
             pathType: Prefix
             backend:
               service:
-                name: whoami-service
+                name: backend
                 port:
                   number: 80
