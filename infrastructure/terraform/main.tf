@@ -135,7 +135,7 @@ resource "kubernetes_secret" "google_credentials" {
 resource "vultr_kubernetes" "k8s" {
   region  = "ewr"
   label   = "ramona-infra"
-  version = "v1.26.2+2"
+  version = "v1.27.2+1"
 
   node_pools {
     node_quantity = 2
