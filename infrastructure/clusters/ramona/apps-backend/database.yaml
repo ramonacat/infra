@@ -1,7 +1,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: backend
+  name: db-backend
   namespace: default
 spec:
   instances: 2
