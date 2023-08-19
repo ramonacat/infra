@@ -15,7 +15,7 @@ spec:
       replicas: 3
       containers:
         - name: backend
-          image: ghcr.io/agares/backend:main-1692485000 # {"$imagepolicy": "flux-system:apps-backend"}
+          image: ghcr.io/agares/backend:main-1692485929 # {"$imagepolicy": "flux-system:apps-backend"}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: secret-db-backend-app
