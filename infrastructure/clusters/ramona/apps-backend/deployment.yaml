@@ -12,6 +12,7 @@ spec:
       labels:
         app: backend
     spec:
+      replicas: 3
       containers:
         - name: backend
           image: ghcr.io/agares/backend:main-1692457441 # {"$imagepolicy": "flux-system:apps-backend"}
@@ -20,6 +21,10 @@ spec:
             - name: secret-db-backend-app
               readOnly: true
               mountPath: /etc/secrets/db-backend-app
+          resources:
+            limits:
+              cpu: '50m'
+              memory: 64M
       initContainers:
         - name: apps-backend-migrations
           image: ghcr.io/agares/backend-migrations:main-1692457441 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
