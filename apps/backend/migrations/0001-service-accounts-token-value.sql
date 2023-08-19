@@ -1,1 +1,1 @@
-ALTER TABLE service_service_account_tokens ADD COLUMN content TEXT NOT NULL
+ALTER TABLE service_account_tokens ADD COLUMN content TEXT NOT NULL
