@@ -3,6 +3,7 @@ use axum::{
     Router,
 };
 use sqlx::postgres::PgPoolOptions;
+use time::OffsetDateTime;
 
 mod secrets;
 
@@ -17,7 +18,7 @@ async fn main() {
         .await
         .expect("Database connection failed");
 
-    let query_result: (String,) = sqlx::query_as("SELECT NOW()").fetch_one(&db_pool).await.expect("Database query failed");
+    let query_result: (OffsetDateTime,) = sqlx::query_as("SELECT NOW()").fetch_one(&db_pool).await.expect("Database query failed");
 
     println!("Database time: {}", query_result.0);
 
