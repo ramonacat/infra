@@ -53,7 +53,7 @@
             };
           backend-migrations = pkgs.dockerTools.buildImage
             {
-              name = "backend";
+              name = "backend-migrations";
               config = {
                 Cmd = [ "${backendPackage}/bin/migrate" ];
                 Labels = {
