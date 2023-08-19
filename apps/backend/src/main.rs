@@ -13,7 +13,7 @@ async fn main() {
 
     let db_pool = PgPoolOptions::new()
         .max_connections(50) // TODO: tune
-        .connect(&format!("postgres://{}:{}@db-backend/db-backend", username, password))
+        .connect(&format!("postgres://{}:{}@db-backend-rw/db-backend", username, password))
         .await
         .expect("Database connection failed");
 
