@@ -17,8 +17,9 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
 
-      - name: Generate docker image ID
-        run: echo image_id=${{ env.REGISTRY }}/agares/backend:${GITHUB_REF##*/}-$(date +%s) >> "$GITHUB_ENV"
+
+      - name: Generate docker image tag
+        run: echo image_tag=${GITHUB_REF##*/}-$(date +%s) >> "$GITHUB_ENV"
 
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
@@ -27,11 +28,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build docker image
-        run: "./docker-build.sh ${{ env.image_id }}"
+      - name: Build backend docker image
+        run: "./docker-build.sh backend  \"${{ env.REGISTRY }}/agares/backend:${{ env.image_tag }}\""
 
-      - name: Print image ID
-        run: echo ${{ env.image_id }}
+      - name: Build backend-migrations docker image
+        run: "./docker-build.sh backend-migrations  \"${{ env.REGISTRY }}/agares/backend-migrations:${{ env.image_tag }}\""
 
-      - name: Publish docker image
-        run: docker push ${{ env.image_id }}
+      - name: Print image tag
+        run: echo ${{ env.image_tag }}
+
+      - name: Publish backend docker image
+        run: docker push "${{ env.REGISTRY }}/agares/backend:${{ env.image_tag }}"
+
+      - name: Publish backend-migrations docker image
+        run: docker push "${{ env.REGISTRY }}/agares/backend-migrations:${{ env.image_tag }}"

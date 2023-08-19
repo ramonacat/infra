@@ -20,6 +20,15 @@ spec:
             - name: secret-db-backend-app
               readOnly: true
               mountPath: /etc/secrets/db-backend-app
+      initContainers:
+        - name: apps-backend-migrations
+          image: ghcr.io/agares/backend-migrations:main-1692451144 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: secret-db-backend-superuser
+              readOnly: true
+              mountPath: /etc/secrets/db-backend-superuser
+
       volumes:
         - name: secret-db-backend-app
           secret:

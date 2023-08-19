@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-IMAGE=$(nix build ".#backend" && docker load < result | sed 's/Loaded image: //')
+IMAGE=$(nix build ".#$1" && docker load < result | sed 's/Loaded image: //')
 
-docker tag "$IMAGE" "$1"
+docker tag "$IMAGE" "$2"
