@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ghcr.io/agares/backend:main-1692451778 # {"$imagepolicy": "flux-system:apps-backend"}
+          image: ghcr.io/agares/backend:main-1692456764 # {"$imagepolicy": "flux-system:apps-backend"}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: secret-db-backend-app
@@ -28,7 +28,6 @@ spec:
             - name: secret-db-backend-superuser
               readOnly: true
               mountPath: /etc/secrets/db-backend-superuser
-
       volumes:
         - name: secret-db-backend-app
           secret:
