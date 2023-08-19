@@ -55,7 +55,7 @@
             {
               name = "backend";
               config = {
-                Cmd = [ "${backendPackage}/bin/backend" ];
+                Cmd = [ "${backendPackage}/bin/migrate" ];
                 Labels = {
                   "org.opencontainers.image.source" = "https://github.com/Agares/infra";
                 };
