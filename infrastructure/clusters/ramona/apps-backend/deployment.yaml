@@ -27,7 +27,7 @@ spec:
               memory: 64M
       initContainers:
         - name: apps-backend-migrations
-          image: ghcr.io/agares/backend-migrations:main-1692485000 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
+          image: ghcr.io/agares/backend-migrations:main-1692485929 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: secret-db-backend-superuser
