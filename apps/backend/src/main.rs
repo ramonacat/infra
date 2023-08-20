@@ -1,11 +1,10 @@
-use std::{env, sync::Arc};
+use std::{collections::HashMap, env, sync::Arc};
 
 use axum::{routing::get, Router};
 use opentelemetry_otlp::WithExportConfig;
 use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
 use time::OffsetDateTime;
-use tonic::metadata::MetadataMap;
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 use uuid::Uuid;
 
@@ -38,9 +37,9 @@ async fn initialize_root_account(
 
 #[tokio::main]
 async fn main() {
-    let mut metadata = MetadataMap::with_capacity(1);
+    let mut metadata = HashMap::<String, String>::with_capacity(1);
     metadata.insert(
-        "x-honeycomb-team",
+        "x-honeycomb-team".to_string(),
         env::var("HONEYCOMB_KEY")
             .expect("failed to read the HONEYCOMB_KEY")
             .parse()
@@ -51,16 +50,19 @@ async fn main() {
         .tracing()
         .with_exporter(
             opentelemetry_otlp::new_exporter()
-                .tonic()
+                .http()
+                .with_http_client(reqwest::Client::default())
                 .with_endpoint("https://api.honeycomb.io/v1/traces")
-                .with_metadata(metadata),
+                .with_headers(metadata),
         )
         .install_batch(opentelemetry::runtime::Tokio)
         .expect("Failed to create the opentelemetry tracer");
 
     let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
 
-    let subscriber = tracing_subscriber::Registry::default().with(telemetry).with(tracing_subscriber::fmt::Layer::default().with_writer(std::io::stdout));
+    let subscriber = tracing_subscriber::Registry::default()
+        .with(telemetry)
+        .with(tracing_subscriber::fmt::Layer::default().with_writer(std::io::stdout));
 
     tracing::subscriber::set_global_default(subscriber)
         .expect("Failed to set global tracing subscriber");
@@ -88,10 +90,13 @@ async fn main() {
     // build our application with a single route
     let app = Router::new()
         // TODO is it possible to set the base path?
-        .route("/api", get(|| async { 
-            tracing::info!("Received an HTTP request");
-            "Hello, World!" 
-        }));
+        .route(
+            "/api",
+            get(|| async {
+                tracing::info!("Received an HTTP request");
+                "Hello, World!"
+            }),
+        );
 
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
         .serve(app.into_make_service())
