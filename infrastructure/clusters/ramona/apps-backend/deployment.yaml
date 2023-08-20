@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ghcr.io/agares/backend:main-1692540311 # {"$imagepolicy": "flux-system:apps-backend"}
+          image: ghcr.io/agares/backend:main-1692542571 # {"$imagepolicy": "flux-system:apps-backend"}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: secret-db-backend-app
@@ -30,12 +30,11 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: "honeycomb-key"
-
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "api.honeycomb.io:443"
       initContainers:
         - name: apps-backend-migrations
-          image: ghcr.io/agares/backend-migrations:main-1692540311 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
+          image: ghcr.io/agares/backend-migrations:main-1692542571 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: secret-db-backend-superuser
