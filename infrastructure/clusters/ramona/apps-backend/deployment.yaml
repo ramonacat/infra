@@ -29,7 +29,9 @@ spec:
             - name: HONEYCOMB_KEY
               valueFrom:
                 secretKeyRef:
-                  key: "honeycomb-key"
+                  name: "honeycomb-key"
+                  key: "HONEYCOMB_KEY"
+
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "api.honeycomb.io:443"
       initContainers:
