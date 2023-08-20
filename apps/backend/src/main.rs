@@ -55,7 +55,7 @@ async fn main() {
                 .with_endpoint("https://api.honeycomb.io")
                 .with_metadata(metadata),
         )
-        .install_simple()
+        .install_batch(opentelemetry::runtime::Tokio)
         .expect("Failed to create the opentelemetry tracer");
 
     let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
