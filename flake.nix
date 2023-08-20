@@ -45,6 +45,10 @@
             version = "0.1.0";
             src = ./apps/backend;
             cargoLock.lockFile = ./apps/backend/Cargo.lock;
+            nativeBuildInputs = [
+              pkgs.pkgconfig
+              pkgs.openssl
+            ];
           };
         in
         {
