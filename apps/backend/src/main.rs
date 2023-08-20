@@ -1,6 +1,7 @@
 use std::{env, sync::Arc};
 
 use axum::{routing::get, Router};
+use opentelemetry_otlp::WithExportConfig;
 use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
 use time::OffsetDateTime;
@@ -51,6 +52,7 @@ async fn main() {
         .with_exporter(
             opentelemetry_otlp::new_exporter()
                 .tonic()
+                .with_endpoint("api.honeycomb.io:443")
                 .with_metadata(metadata),
         )
         .install_simple()

@@ -32,8 +32,6 @@ spec:
                   name: "honeycomb-key"
                   key: "HONEYCOMB_KEY"
 
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "api.honeycomb.io:443"
       initContainers:
         - name: apps-backend-migrations
           image: ghcr.io/agares/backend-migrations:main-1692542571 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
