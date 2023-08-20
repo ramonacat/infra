@@ -4,6 +4,7 @@ metadata:
   name: backend
   namespace: default
 spec:
+  replicas: 3
   selector:
     matchLabels:
       app: backend
@@ -12,7 +13,6 @@ spec:
       labels:
         app: backend
     spec:
-      replicas: 3
       containers:
         - name: backend
           image: ghcr.io/agares/backend:main-1692529839 # {"$imagepolicy": "flux-system:apps-backend"}

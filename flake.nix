@@ -14,9 +14,14 @@
     {
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
       devShells.x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.mkShell {
+        shellHook = ''
+          cargo install sqlx-cli
+        '';
         packages = with nixpkgs.legacyPackages.x86_64-linux; [
           terraform
           fluxcd
+          pkgconfig
+          openssl
           (pkgs.rust-bin.stable.latest.default.override {
             extensions = [ "rust-src" ];
           })

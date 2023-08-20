@@ -8,5 +8,7 @@ edition = "2021"
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 axum = "0.6.18"
-sqlx= { version = "0.6", features = ["runtime-tokio-rustls", "migrate", "offline", "postgres", "time"] }
+sqlx= { version = "0.6", features = ["runtime-tokio-rustls", "migrate", "postgres", "time", "uuid"] }
 time = "0.3.26"
+uuid = { version = "1.4.1", features = ["v4"] }
+rand = "0.8.5"
