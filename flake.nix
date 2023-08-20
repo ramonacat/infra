@@ -59,6 +59,7 @@
             {
               name = "backend";
               config = {
+                contents = [ pkgs.cacert ];
                 Cmd = [ "${backendPackage}/bin/backend" ];
                 Labels = {
                   "org.opencontainers.image.source" = "https://github.com/Agares/infra";
@@ -69,6 +70,7 @@
             {
               name = "backend-migrations";
               config = {
+                contents = [ pkgs.cacert ];
                 Cmd = [ "${backendPackage}/bin/migrate" ];
                 Labels = {
                   "org.opencontainers.image.source" = "https://github.com/Agares/infra";
