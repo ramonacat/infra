@@ -5,6 +5,6 @@ CREATE TABLE service_accounts (
 
 CREATE TABLE service_account_tokens (
     id UUID PRIMARY KEY,
-    service_account UUID REFERENCES(service_accounts.id) ON DELETE CASCADE,
+    service_account UUID REFERENCES service_accounts(id) ON DELETE CASCADE,
     content TEXT NOT NULL
 );
