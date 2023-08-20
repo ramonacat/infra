@@ -52,7 +52,7 @@ async fn main() {
         .with_exporter(
             opentelemetry_otlp::new_exporter()
                 .tonic()
-                .with_endpoint("api.honeycomb.io:443")
+                .with_endpoint("https://api.honeycomb.io")
                 .with_metadata(metadata),
         )
         .install_simple()
