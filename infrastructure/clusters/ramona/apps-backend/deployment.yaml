@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ghcr.io/agares/backend:main-1692542571 # {"$imagepolicy": "flux-system:apps-backend"}
+          image: ghcr.io/agares/backend:main-1692544070 # {"$imagepolicy": "flux-system:apps-backend"}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: secret-db-backend-app
@@ -31,10 +31,9 @@ spec:
                 secretKeyRef:
                   name: "honeycomb-key"
                   key: "HONEYCOMB_KEY"
-
       initContainers:
         - name: apps-backend-migrations
-          image: ghcr.io/agares/backend-migrations:main-1692542571 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
+          image: ghcr.io/agares/backend-migrations:main-1692544070 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: secret-db-backend-superuser
