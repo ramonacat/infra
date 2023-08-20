@@ -10,7 +10,6 @@ use uuid::Uuid;
 
 mod database;
 mod secrets;
-
 mod service_accounts;
 
 const ROOT_ACCOUNT_NAME: &str = "root";
