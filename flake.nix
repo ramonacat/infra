@@ -49,6 +49,9 @@
               pkgs.pkgconfig
               pkgs.openssl
             ];
+            buildInputs = [
+              pkgs.openssl
+            ];
           };
         in
         {
