@@ -1,1 +1,0 @@
-ALTER TABLE service_account_tokens ADD COLUMN content TEXT NOT NULL
