@@ -24,7 +24,7 @@ spec:
           resources:
             limits:
               cpu: '50m'
-              memory: 128M
+              memory: 256M
           env:
             - name: HONEYCOMB_KEY
               valueFrom:
