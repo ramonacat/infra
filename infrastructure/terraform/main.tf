@@ -5,6 +5,7 @@ variable "ovh_consumer_key" {}
 variable "vultr_api_key" {}
 variable "github_token" {}
 variable "google_credentials" {}
+variable "honeycomb_key" {}
 
 terraform {
   backend "remote" {
@@ -129,6 +130,16 @@ resource "kubernetes_secret" "google_credentials" {
   }
   data = {
     GOOGLE_CREDENTIALS = var.google_credentials
+  }
+}
+
+resource "kubernetes_secret" "honeycomb_key" {
+  metadata {
+    name      = "honeycomb-key"
+    namespace = "default"
+  }
+  data = {
+    HONEYCOMB_KEY = var.honeycomb_key
   }
 }
 

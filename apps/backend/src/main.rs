@@ -1,9 +1,11 @@
-use std::sync::Arc;
+use std::{env, sync::Arc};
 
 use axum::{routing::get, Router};
 use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
 use time::OffsetDateTime;
+use tonic::metadata::MetadataMap;
+use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 use uuid::Uuid;
 
 mod database;
@@ -35,6 +37,32 @@ async fn initialize_root_account(
 
 #[tokio::main]
 async fn main() {
+    let mut metadata = MetadataMap::with_capacity(1);
+    metadata.insert(
+        "x-honeycomb-team",
+        env::var("HONEYCOMB_KEY")
+            .expect("failed to read the HONEYCOMB_KEY")
+            .parse()
+            .unwrap(),
+    );
+
+    let tracer = opentelemetry_otlp::new_pipeline()
+        .tracing()
+        .with_exporter(
+            opentelemetry_otlp::new_exporter()
+                .tonic()
+                .with_metadata(metadata),
+        )
+        .install_simple()
+        .expect("Failed to create the opentelemetry tracer");
+
+    let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+
+    let subscriber = tracing_subscriber::Registry::default().with(telemetry);
+
+    tracing::subscriber::set_global_default(subscriber)
+        .expect("Failed to set global tracing subscriber");
+
     let db_pool = database::connect(database::DatabaseAccessLevel::App)
         .await
         .expect("Database connection failed");
@@ -58,7 +86,10 @@ async fn main() {
     // build our application with a single route
     let app = Router::new()
         // TODO is it possible to set the base path?
-        .route("/api", get(|| async { "Hello, World!" }));
+        .route("/api", get(|| async { 
+            tracing::info!("Received an HTTP request");
+            "Hello, World!" 
+        }));
 
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
         .serve(app.into_make_service())

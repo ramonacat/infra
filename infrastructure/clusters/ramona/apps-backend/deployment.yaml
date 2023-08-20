@@ -25,6 +25,14 @@ spec:
             limits:
               cpu: '50m'
               memory: 64M
+          env:
+            - name: HONEYCOMB_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: "honeycomb-key"
+
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "api.honeycomb.io:443"
       initContainers:
         - name: apps-backend-migrations
           image: ghcr.io/agares/backend-migrations:main-1692540311 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
@@ -40,6 +48,9 @@ spec:
         - name: secret-db-backend-superuser
           secret:
             secretName: db-backend-superuser
+        - name: secret-honeycomb-key
+          secret:
+            secretName: honeycomb-key
 ---
 apiVersion: v1
 kind: Service
