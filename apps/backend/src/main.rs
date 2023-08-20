@@ -11,7 +11,7 @@ mod secrets;
 
 mod service_accounts;
 
-const ROOT_ACCOUNT_NAME: &'static str = "root";
+const ROOT_ACCOUNT_NAME: &str = "root";
 
 async fn initialize_root_account(
     repository: Arc<ServiceAccountRepository>,
