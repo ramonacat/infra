@@ -16,6 +16,8 @@
       devShells.x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.mkShell {
         shellHook = ''
           cargo install sqlx-cli
+
+          docker run -p 5432:5432 --name backend-pgsql -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=app -d postgres
         '';
         packages = with nixpkgs.legacyPackages.x86_64-linux; [
           terraform

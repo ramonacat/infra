@@ -1,23 +1,26 @@
 use std::sync::Arc;
 
 use axum::{routing::get, Router};
-use rand::{Rng, CryptoRng, thread_rng};
-use service_accounts::{ServiceAccountRepository, ServiceAccount, ServiceAccountToken};
+use rand::{thread_rng, CryptoRng, Rng};
+use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
 use time::OffsetDateTime;
-use uuid::{Uuid};
+use uuid::Uuid;
 
 mod database;
 mod secrets;
 
 mod service_accounts;
 
-const ROOT_ACCOUNT_NAME:&'static str = "root";
+const ROOT_ACCOUNT_NAME: &'static str = "root";
 
-async fn initialize_root_account(repository: Arc<ServiceAccountRepository>, csprng: impl CryptoRng + Rng) -> Result<(), sqlx::Error> {
+async fn initialize_root_account(
+    repository: Arc<ServiceAccountRepository>,
+    csprng: impl CryptoRng + Rng,
+) -> Result<(), sqlx::Error> {
     let current_account = repository.find_by_name(ROOT_ACCOUNT_NAME).await?;
 
     match current_account {
-        Some(_) => {},
+        Some(_) => {}
         None => {
             let mut account = ServiceAccount::create(Uuid::new_v4(), ROOT_ACCOUNT_NAME.into());
 
@@ -38,7 +41,12 @@ async fn main() {
     let db_pool = Arc::new(db_pool);
     let csprng = thread_rng();
 
-    initialize_root_account(Arc::new(ServiceAccountRepository::new(db_pool.clone())), csprng).await.expect("Failed to init root account");
+    initialize_root_account(
+        Arc::new(ServiceAccountRepository::new(db_pool.clone())),
+        csprng,
+    )
+    .await
+    .expect("Failed to init root account");
 
     let query_result: (OffsetDateTime,) = sqlx::query_as("SELECT NOW()")
         .fetch_one(db_pool.as_ref())

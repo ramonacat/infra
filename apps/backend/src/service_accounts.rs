@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use rand::{CryptoRng, Rng, distributions::Alphanumeric};
+use rand::{distributions::Alphanumeric, CryptoRng, Rng};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -12,7 +12,11 @@ pub struct ServiceAccountToken {
 
 impl ServiceAccountToken {
     pub fn create(id: Uuid, csprng: impl CryptoRng + Rng) -> Self {
-        let content  = csprng.sample_iter(&Alphanumeric).take(128).map(char::from).collect();
+        let content = csprng
+            .sample_iter(&Alphanumeric)
+            .take(128)
+            .map(char::from)
+            .collect();
 
         Self { id, content }
     }
@@ -48,10 +52,15 @@ impl ServiceAccountRepository {
         Self { db_pool }
     }
 
-    pub async fn find_by_name(&self, name: impl Into<&str>) -> Result<Option<ServiceAccount>, sqlx::Error> {
+    pub async fn find_by_name(
+        &self,
+        name: impl Into<&str>,
+    ) -> Result<Option<ServiceAccount>, sqlx::Error> {
         let name: &str = name.into();
 
-        let account = sqlx::query!("SELECT id, name FROM service_accounts WHERE name=$1", name).fetch_optional(self.db_pool.as_ref()).await?;
+        let account = sqlx::query!("SELECT id, name FROM service_accounts WHERE name=$1", name)
+            .fetch_optional(self.db_pool.as_ref())
+            .await?;
 
         let Some(account) = account else {
             return Ok(None);
@@ -72,13 +81,22 @@ impl ServiceAccountRepository {
             .await?;
 
         for token in account.tokens {
-            let current = sqlx::query!("SELECT content FROM service_account_tokens WHERE id=$1", token.id)
-                .fetch_optional(self.db_pool.as_ref())
-                .await?;
+            let current = sqlx::query!(
+                "SELECT content FROM service_account_tokens WHERE id=$1",
+                token.id
+            )
+            .fetch_optional(self.db_pool.as_ref())
+            .await?;
 
             if let Some(current) = current {
                 if current.content != token.content {
-                    sqlx::query!("UPDATE service_account_tokens SET content = $1 WHERE id = $2", token.content, token.id).execute(self.db_pool.as_ref()).await?;
+                    sqlx::query!(
+                        "UPDATE service_account_tokens SET content = $1 WHERE id = $2",
+                        token.content,
+                        token.id
+                    )
+                    .execute(self.db_pool.as_ref())
+                    .await?;
                 }
             } else {
                 sqlx::query!("INSERT INTO service_account_tokens (id, content, service_account) VALUES($1, $2, $3)", token.id, token.content, account.id).execute(self.db_pool.as_ref()).await?;
@@ -88,7 +106,10 @@ impl ServiceAccountRepository {
         Ok(())
     }
 
-    async fn find_tokens_for_account(&self, account_id: Uuid) -> Result<Vec<ServiceAccountToken>, sqlx::Error> {
+    async fn find_tokens_for_account(
+        &self,
+        account_id: Uuid,
+    ) -> Result<Vec<ServiceAccountToken>, sqlx::Error> {
         sqlx::query_as!(
             ServiceAccountToken,
             "SELECT id, content FROM service_account_tokens WHERE service_account=$1",
