@@ -1,6 +1,7 @@
 use std::{collections::HashMap, env, sync::Arc};
 
 use axum::{routing::get, Router};
+use axum_tracing_opentelemetry::middleware::{OtelInResponseLayer, OtelAxumLayer};
 use opentelemetry_otlp::WithExportConfig;
 use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
@@ -95,10 +96,17 @@ async fn main() {
                 tracing::info!("Received an HTTP request");
                 "Hello, World!"
             }),
-        );
+        )
+        .layer(OtelInResponseLayer::default())
+        .layer(OtelAxumLayer::default());
 
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
         .serve(app.into_make_service())
+        .with_graceful_shutdown(shutdown_signal_handler())
         .await
         .unwrap();
+}
+
+async fn shutdown_signal_handler() {
+    opentelemetry::global::shutdown_tracer_provider();
 }
