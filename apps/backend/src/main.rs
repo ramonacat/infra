@@ -109,11 +109,6 @@ async fn main() {
 
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
         .serve(app.into_make_service())
-        .with_graceful_shutdown(shutdown_signal_handler())
         .await
         .unwrap();
-}
-
-async fn shutdown_signal_handler() {
-    opentelemetry::global::shutdown_tracer_provider();
 }
