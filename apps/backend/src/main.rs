@@ -1,7 +1,8 @@
 use std::{collections::HashMap, env, sync::Arc};
 
 use axum::{routing::get, Router};
-use axum_tracing_opentelemetry::middleware::{OtelInResponseLayer, OtelAxumLayer};
+use axum_tracing_opentelemetry::middleware::{OtelAxumLayer, OtelInResponseLayer};
+use opentelemetry::{sdk::Resource, KeyValue};
 use opentelemetry_otlp::WithExportConfig;
 use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
@@ -55,6 +56,12 @@ async fn main() {
                 .with_endpoint("https://api.honeycomb.io/v1/traces")
                 .with_headers(metadata),
         )
+        .with_trace_config(
+            opentelemetry::sdk::trace::config().with_resource(Resource::new(vec![KeyValue::new(
+                "service.name",
+                "backend",
+            )])),
+        )
         .install_batch(opentelemetry::runtime::Tokio)
         .expect("Failed to create the opentelemetry tracer");
 
@@ -97,7 +104,7 @@ async fn main() {
                 "Hello, World!"
             }),
         )
-        .layer(OtelInResponseLayer::default())
+        .layer(OtelInResponseLayer)
         .layer(OtelAxumLayer::default());
 
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
