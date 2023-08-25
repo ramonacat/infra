@@ -7,7 +7,7 @@ use opentelemetry_otlp::WithExportConfig;
 use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
 use time::OffsetDateTime;
-use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
+use tracing_subscriber::{filter::LevelFilter, prelude::__tracing_subscriber_SubscriberExt, Layer};
 use uuid::Uuid;
 
 mod database;
@@ -65,12 +65,17 @@ async fn main() {
         .install_batch(opentelemetry::runtime::Tokio)
         .expect("Failed to create the opentelemetry tracer");
 
-    let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+    let telemetry = tracing_opentelemetry::layer()
+        .with_tracer(tracer)
+        .with_filter(LevelFilter::INFO);
 
     let subscriber = tracing_subscriber::Registry::default()
         .with(telemetry)
-        .with(tracing_subscriber::fmt::Layer::default().with_writer(std::io::stdout));
-
+        .with(
+            tracing_subscriber::fmt::Layer::default()
+                .with_writer(std::io::stdout)
+                .with_filter(LevelFilter::INFO),
+        );
     tracing::subscriber::set_global_default(subscriber)
         .expect("Failed to set global tracing subscriber");
 
