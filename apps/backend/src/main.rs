@@ -1,12 +1,12 @@
 use std::{collections::HashMap, env, sync::Arc};
 
 use axum::{routing::get, Router};
-use axum_tracing_opentelemetry::middleware::{OtelAxumLayer, OtelInResponseLayer};
 use opentelemetry::{sdk::Resource, KeyValue};
 use opentelemetry_otlp::WithExportConfig;
 use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
-use time::OffsetDateTime;
+use tower_http::trace::{DefaultOnRequest, DefaultOnResponse};
+use tracing::Level;
 use tracing_subscriber::{filter::LevelFilter, prelude::__tracing_subscriber_SubscriberExt, Layer};
 use uuid::Uuid;
 
@@ -92,13 +92,6 @@ async fn main() {
     .await
     .expect("Failed to init root account");
 
-    let query_result: (OffsetDateTime,) = sqlx::query_as("SELECT NOW()")
-        .fetch_one(db_pool.as_ref())
-        .await
-        .expect("Database query failed");
-
-    println!("Database time: {}", query_result.0);
-
     // build our application with a single route
     let app = Router::new()
         // TODO is it possible to set the base path?
@@ -109,8 +102,11 @@ async fn main() {
                 "Hello, World!"
             }),
         )
-        .layer(OtelInResponseLayer)
-        .layer(OtelAxumLayer::default());
+        .layer(
+            tower_http::trace::TraceLayer::new_for_http()
+                .on_request(DefaultOnRequest::new().level(Level::INFO))
+                .on_response(DefaultOnResponse::new().level(Level::INFO)),
+        );
 
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
         .serve(app.into_make_service())
