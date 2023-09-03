@@ -62,7 +62,7 @@ async fn main() {
                 "backend",
             )])),
         )
-        .install_batch(opentelemetry::runtime::Tokio)
+        .install_simple()
         .expect("Failed to create the opentelemetry tracer");
 
     let telemetry = tracing_opentelemetry::layer()
