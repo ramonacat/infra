@@ -66,15 +66,13 @@ async fn main() {
         .expect("Failed to create the opentelemetry tracer");
 
     let telemetry = tracing_opentelemetry::layer()
-        .with_tracer(tracer)
-        .with_filter(LevelFilter::INFO);
+        .with_tracer(tracer);
 
     let subscriber = tracing_subscriber::Registry::default()
         .with(telemetry)
         .with(
             tracing_subscriber::fmt::Layer::default()
-                .with_writer(std::io::stdout)
-                .with_filter(LevelFilter::INFO),
+                .with_writer(std::io::stdout),
         );
     tracing::subscriber::set_global_default(subscriber)
         .expect("Failed to set global tracing subscriber");
