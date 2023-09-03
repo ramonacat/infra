@@ -62,17 +62,19 @@ async fn main() {
                 "backend",
             )])),
         )
-        .install_simple()
+        .install_batch(opentelemetry::runtime::Tokio)
         .expect("Failed to create the opentelemetry tracer");
 
     let telemetry = tracing_opentelemetry::layer()
-        .with_tracer(tracer);
+        .with_tracer(tracer)
+        .with_filter(LevelFilter::INFO);
 
     let subscriber = tracing_subscriber::Registry::default()
         .with(telemetry)
         .with(
             tracing_subscriber::fmt::Layer::default()
-                .with_writer(std::io::stdout),
+                .with_writer(std::io::stdout)
+                .with_filter(LevelFilter::INFO),
         );
     tracing::subscriber::set_global_default(subscriber)
         .expect("Failed to set global tracing subscriber");
