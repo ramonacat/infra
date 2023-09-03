@@ -73,8 +73,7 @@ async fn main() {
         .with(telemetry)
         .with(
             tracing_subscriber::fmt::Layer::default()
-                .with_writer(std::io::stdout)
-                .with_filter(LevelFilter::INFO),
+                .with_writer(std::io::stdout),
         );
     tracing::subscriber::set_global_default(subscriber)
         .expect("Failed to set global tracing subscriber");
