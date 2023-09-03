@@ -66,8 +66,7 @@ async fn main() {
         .expect("Failed to create the opentelemetry tracer");
 
     let telemetry = tracing_opentelemetry::layer()
-        .with_tracer(tracer)
-        .with_filter(LevelFilter::INFO);
+        .with_tracer(tracer);
 
     let subscriber = tracing_subscriber::Registry::default()
         .with(telemetry)
