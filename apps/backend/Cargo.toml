@@ -16,7 +16,7 @@ tracing = "0.1.37"
 opentelemetry = { version = "0.20.0", features=["rt-tokio"] }
 tracing-opentelemetry = "0.20.0"
 opentelemetry-otlp = { version = "0.13.0", features=["tokio", "http-proto", "reqwest-client", "reqwest-rustls", "opentelemetry-http"] }
-tracing-subscriber = "0.3.17"
+tracing-subscriber = { version = "0.3.17", features=["env-filter"] }
 tonic = "0.9.2"
 reqwest = { version = "0.11.18", features = ["tokio-rustls", "rustls-tls-webpki-roots"], default-features = false }
 tower-http = { version = "0.4.4", features = ["tokio", "tracing", "trace"] }
