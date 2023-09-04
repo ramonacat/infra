@@ -11,7 +11,7 @@ use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
 use tower_http::trace::{DefaultOnRequest, DefaultOnResponse};
 use tracing::Level;
-use tracing_subscriber::prelude::*;
+use tracing_subscriber::{filter::LevelFilter, prelude::*};
 use uuid::Uuid;
 
 mod database;
@@ -69,11 +69,17 @@ async fn main() {
         .install_batch(runtime::Tokio)
         .expect("Failed to create the opentelemetry tracer");
 
-    let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+    let telemetry = tracing_opentelemetry::layer()
+        .with_tracer(tracer)
+        .with_filter(LevelFilter::INFO);
 
     let subscriber = tracing_subscriber::Registry::default()
         .with(telemetry)
-        .with(tracing_subscriber::fmt::Layer::default().with_writer(std::io::stdout));
+        .with(
+            tracing_subscriber::fmt::Layer::default()
+                .with_writer(std::io::stdout)
+                .with_filter(LevelFilter::INFO),
+        );
     tracing::subscriber::set_global_default(subscriber)
         .expect("Failed to set global tracing subscriber");
 
