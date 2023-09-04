@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ghcr.io/agares/backend:main-1693852172 # {"$imagepolicy": "flux-system:apps-backend"}
+          image: ghcr.io/agares/backend:main-1693853707 # {"$imagepolicy": "flux-system:apps-backend"}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: secret-db-backend-app
@@ -35,7 +35,7 @@ spec:
               value: "1"
       initContainers:
         - name: apps-backend-migrations
-          image: ghcr.io/agares/backend-migrations:main-1693852172 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
+          image: ghcr.io/agares/backend-migrations:main-1693853707 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: secret-db-backend-superuser
