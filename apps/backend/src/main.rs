@@ -73,8 +73,8 @@ async fn main() {
 
     let subscriber = tracing_subscriber::Registry::default()
         .with(EnvFilter::try_from_default_env().unwrap_or(EnvFilter::new("info")))
-        .with(telemetry)
-        .with(tracing_subscriber::fmt::Layer::default().with_writer(std::io::stdout));
+        .with(tracing_subscriber::fmt::Layer::default().with_writer(std::io::stdout))
+        .with(telemetry);
     tracing::subscriber::set_global_default(subscriber)
         .expect("Failed to set global tracing subscriber");
 
