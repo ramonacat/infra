@@ -31,6 +31,8 @@ spec:
                 secretKeyRef:
                   name: "honeycomb-key"
                   key: "HONEYCOMB_KEY"
+            - name: RUST_BACKTRACE
+              value: "1"
       initContainers:
         - name: apps-backend-migrations
           image: ghcr.io/agares/backend-migrations:main-1693779628 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
