@@ -1,13 +1,17 @@
 use std::{collections::HashMap, env, sync::Arc};
 
 use axum::{routing::get, Router};
-use opentelemetry::{sdk::{Resource, logs::BatchConfig, trace::BatchConfig, self}, KeyValue, runtime::{Runtime, self}};
+use opentelemetry::{
+    runtime::{self},
+    sdk::Resource,
+    KeyValue,
+};
 use opentelemetry_otlp::WithExportConfig;
 use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
 use tower_http::trace::{DefaultOnRequest, DefaultOnResponse};
 use tracing::Level;
-use tracing_subscriber::{filter::LevelFilter, prelude::__tracing_subscriber_SubscriberExt, Layer};
+use tracing_subscriber::prelude::*;
 use uuid::Uuid;
 
 mod database;
@@ -62,7 +66,6 @@ async fn main() {
                 "backend",
             )])),
         )
-        .with_batch_config(sdk::trace::BatchConfig::default())
         .install_batch(runtime::Tokio)
         .expect("Failed to create the opentelemetry tracer");
 
