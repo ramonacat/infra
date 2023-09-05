@@ -1,10 +1,7 @@
-use std::{collections::HashMap, env, sync::Arc, time::Duration};
+use std::{collections::HashMap, env, sync::Arc};
 
 use axum::{routing::get, Router};
-use opentelemetry::{
-    sdk::{trace::Sampler, Resource},
-    KeyValue,
-};
+use opentelemetry::{runtime, sdk::Resource, trace::Tracer, KeyValue};
 use opentelemetry_otlp::WithExportConfig;
 use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
@@ -57,20 +54,18 @@ async fn main() {
                 .http()
                 .with_http_client(reqwest::Client::default())
                 .with_endpoint("https://api.honeycomb.io/v1/traces")
-                .with_headers(metadata)
-                .with_timeout(Duration::from_secs(3)),
+                .with_headers(metadata),
         )
         .with_trace_config(
-            opentelemetry::sdk::trace::config()
-                .with_sampler(Sampler::AlwaysOn)
-                .with_resource(Resource::new(vec![KeyValue::new(
-                    "service.name",
-                    "backend",
-                )])),
+            opentelemetry::sdk::trace::config().with_resource(Resource::new(vec![KeyValue::new(
+                "service.name",
+                "backend",
+            )])),
         )
-        // .install_batch(runtime::Tokio)
-        .install_simple()
+        .install_batch(runtime::Tokio)
         .expect("Failed to create the opentelemetry tracer");
+
+    tracer.in_span("beepboop", |_| tracing::info!("beep boop"));
 
     let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
 
