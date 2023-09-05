@@ -11,7 +11,7 @@ use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
 use tower_http::trace::{DefaultOnRequest, DefaultOnResponse};
 use tracing::Level;
-use tracing_subscriber::{prelude::*, EnvFilter};
+use tracing_subscriber::{prelude::*, filter::LevelFilter};
 use uuid::Uuid;
 
 mod database;
@@ -75,11 +75,13 @@ async fn main() {
     let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
 
     let subscriber = tracing_subscriber::Registry::default()
-        // .with(EnvFilter::try_from_default_env().unwrap_or(EnvFilter::new("info")))
         .with(tracing_subscriber::fmt::Layer::default().with_writer(std::io::stdout))
-        .with(telemetry);
+        .with(telemetry.with_filter(LevelFilter::INFO));
+
     tracing::subscriber::set_global_default(subscriber)
         .expect("Failed to set global tracing subscriber");
+
+    tracing::info!("Initialized tracing!");
 
     let db_pool = database::connect(database::DatabaseAccessLevel::App)
         .await
