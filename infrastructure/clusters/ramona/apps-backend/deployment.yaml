@@ -35,7 +35,7 @@ spec:
               value: "1"
       initContainers:
         - name: apps-backend-migrations
-          image: ghcr.io/agares/backend-migrations:main-1693945033 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
+          image: ghcr.io/agares/backend-migrations:main-1693947036 # {"$imagepolicy": "flux-system:apps-backend-migrations"}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: secret-db-backend-superuser
