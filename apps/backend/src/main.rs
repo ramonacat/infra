@@ -5,7 +5,7 @@ use opentelemetry::{runtime, sdk::Resource, KeyValue};
 use opentelemetry_otlp::WithExportConfig;
 use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
-use tower_http::trace::{DefaultOnRequest, DefaultOnResponse};
+use tower_http::trace::{DefaultOnRequest, DefaultOnResponse, DefaultMakeSpan};
 use tracing::Level;
 use tracing_subscriber::{filter::LevelFilter, prelude::*};
 use uuid::Uuid;
@@ -101,6 +101,7 @@ async fn main() {
         )
         .layer(
             tower_http::trace::TraceLayer::new_for_http()
+                .make_span_with(DefaultMakeSpan::new().level(Level::INFO))
                 .on_request(DefaultOnRequest::new().level(Level::INFO))
                 .on_response(DefaultOnResponse::new().level(Level::INFO)),
         );
