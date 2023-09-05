@@ -75,7 +75,7 @@ async fn main() {
     let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
 
     let subscriber = tracing_subscriber::Registry::default()
-        .with(EnvFilter::try_from_default_env().unwrap_or(EnvFilter::new("info")))
+        // .with(EnvFilter::try_from_default_env().unwrap_or(EnvFilter::new("info")))
         .with(tracing_subscriber::fmt::Layer::default().with_writer(std::io::stdout))
         .with(telemetry);
     tracing::subscriber::set_global_default(subscriber)
