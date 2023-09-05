@@ -1,7 +1,7 @@
 use std::{collections::HashMap, env, sync::Arc};
 
 use axum::{routing::get, Router};
-use opentelemetry::{runtime, sdk::Resource, trace::Tracer, KeyValue};
+use opentelemetry::{runtime, sdk::Resource, KeyValue};
 use opentelemetry_otlp::WithExportConfig;
 use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
@@ -65,8 +65,6 @@ async fn main() {
         .install_batch(runtime::Tokio)
         .expect("Failed to create the opentelemetry tracer");
 
-    tracer.in_span("beepboop", |_| tracing::info!("beep boop"));
-
     let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
 
     tracing_subscriber::Registry::default()
@@ -95,6 +93,8 @@ async fn main() {
         .route(
             "/api",
             get(|| async {
+                tracing::info_span!("request");
+
                 tracing::info!("Received an HTTP request");
                 "Hello, World!"
             }),
