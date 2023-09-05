@@ -74,12 +74,10 @@ async fn main() {
 
     let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
 
-    let subscriber = tracing_subscriber::Registry::default()
+    tracing_subscriber::Registry::default()
         .with(tracing_subscriber::fmt::Layer::default().with_writer(std::io::stdout))
-        .with(telemetry.with_filter(LevelFilter::INFO));
-
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("Failed to set global tracing subscriber");
+        .with(telemetry.with_filter(LevelFilter::INFO))
+        .init();
 
     tracing::info!("Initialized tracing!");
 
