@@ -2,7 +2,6 @@ use std::{collections::HashMap, env, sync::Arc, time::Duration};
 
 use axum::{routing::get, Router};
 use opentelemetry::{
-    runtime::{self},
     sdk::{trace::Sampler, Resource},
     KeyValue,
 };
@@ -11,7 +10,7 @@ use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
 use tower_http::trace::{DefaultOnRequest, DefaultOnResponse};
 use tracing::Level;
-use tracing_subscriber::{prelude::*, filter::LevelFilter};
+use tracing_subscriber::{filter::LevelFilter, prelude::*};
 use uuid::Uuid;
 
 mod database;
@@ -69,7 +68,8 @@ async fn main() {
                     "backend",
                 )])),
         )
-        .install_batch(runtime::Tokio)
+        // .install_batch(runtime::Tokio)
+        .install_simple()
         .expect("Failed to create the opentelemetry tracer");
 
     let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
