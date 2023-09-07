@@ -2,19 +2,17 @@ use sqlx::postgres::PgPoolOptions;
 
 use crate::secrets;
 
-pub enum DatabaseAccessLevel {
+pub enum AccessLevel {
     #[allow(unused)]
     Superuser,
     #[allow(unused)]
     App,
 }
 
-pub async fn connect(
-    access_level: DatabaseAccessLevel,
-) -> Result<sqlx::Pool<sqlx::Postgres>, sqlx::Error> {
+pub async fn connect(access_level: AccessLevel) -> Result<sqlx::Pool<sqlx::Postgres>, sqlx::Error> {
     let secret_name = match access_level {
-        DatabaseAccessLevel::Superuser => "db-backend-superuser",
-        DatabaseAccessLevel::App => "db-backend-app",
+        AccessLevel::Superuser => "db-backend-superuser",
+        AccessLevel::App => "db-backend-app",
     };
 
     let username = secrets::read(secret_name, "username").expect("Failed to read username");
@@ -23,8 +21,7 @@ pub async fn connect(
     PgPoolOptions::new()
         .max_connections(50) // TODO: tune
         .connect(&format!(
-            "postgres://{}:{}@db-backend-rw/app",
-            username, password
+            "postgres://{username}:{password}@db-backend-rw/app"
         ))
         .await
 }

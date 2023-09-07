@@ -1,3 +1,5 @@
+#![deny(clippy::all, clippy::pedantic, clippy::nursery)]
+
 use std::{collections::HashMap, sync::Arc};
 
 use axum::{routing::get, Router};
@@ -16,21 +18,18 @@ mod service_accounts;
 
 const ROOT_ACCOUNT_NAME: &str = "root";
 
-async fn initialize_root_account(
+async fn initialize_root_account<TCryptoRng: CryptoRng + Rng>(
     repository: Arc<ServiceAccountRepository>,
-    csprng: impl CryptoRng + Rng,
+    csprng: impl (FnOnce() -> TCryptoRng) + Send,
 ) -> Result<(), sqlx::Error> {
     let current_account = repository.find_by_name(ROOT_ACCOUNT_NAME).await?;
 
-    match current_account {
-        Some(_) => {}
-        None => {
-            let mut account = ServiceAccount::create(Uuid::new_v4(), ROOT_ACCOUNT_NAME.into());
+    if current_account.is_none() {
+        let mut account = ServiceAccount::create(Uuid::new_v4(), ROOT_ACCOUNT_NAME.into());
 
-            account.add_token(ServiceAccountToken::create(Uuid::new_v4(), csprng));
+        account.add_token(ServiceAccountToken::create(Uuid::new_v4(), csprng));
 
-            repository.save(account).await?;
-        }
+        repository.save(account).await?;
     }
 
     Ok(())
@@ -72,15 +71,14 @@ async fn main() {
 
     tracing::info!("Initialized tracing!");
 
-    let db_pool = database::connect(database::DatabaseAccessLevel::App)
+    let db_pool = database::connect(database::AccessLevel::App)
         .await
         .expect("Database connection failed");
     let db_pool = Arc::new(db_pool);
-    let csprng = thread_rng();
 
     initialize_root_account(
         Arc::new(ServiceAccountRepository::new(db_pool.clone())),
-        csprng,
+        thread_rng,
     )
     .await
     .expect("Failed to init root account");

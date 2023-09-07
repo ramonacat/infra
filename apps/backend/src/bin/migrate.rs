@@ -5,7 +5,7 @@ mod secrets;
 
 #[tokio::main]
 async fn main() {
-    let db_pool = crate::database::connect(database::DatabaseAccessLevel::Superuser)
+    let db_pool = crate::database::connect(database::AccessLevel::Superuser)
         .await
         .expect("Database connection failed");
 

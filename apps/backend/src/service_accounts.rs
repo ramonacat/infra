@@ -11,8 +11,11 @@ pub struct ServiceAccountToken {
 }
 
 impl ServiceAccountToken {
-    pub fn create(id: Uuid, csprng: impl CryptoRng + Rng) -> Self {
-        let content = csprng
+    pub fn create<TCryptoRng: CryptoRng + Rng>(
+        id: Uuid,
+        csprng: impl (FnOnce() -> TCryptoRng),
+    ) -> Self {
+        let content = csprng()
             .sample_iter(&Alphanumeric)
             .take(128)
             .map(char::from)
@@ -54,7 +57,7 @@ impl ServiceAccountRepository {
 
     pub async fn find_by_name(
         &self,
-        name: impl Into<&str>,
+        name: impl Into<&str> + Send,
     ) -> Result<Option<ServiceAccount>, sqlx::Error> {
         let name: &str = name.into();
 
