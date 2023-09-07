@@ -3,9 +3,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
+    crane.url = "github:ipetkov/crane";
+    crane.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, rust-overlay }:
+  outputs = { self, nixpkgs, rust-overlay, crane }:
     let
       overlays = [ (import rust-overlay) ];
       pkgs = import nixpkgs { inherit overlays; system = "x86_64-linux"; };
@@ -35,45 +37,41 @@
           overlays = [ (import rust-overlay) ];
           pkgs = import nixpkgs { inherit overlays; system = "x86_64-linux"; };
           rustVersion = pkgs.rust-bin.stable.latest.default;
-          rustPlatform = pkgs.makeRustPlatform {
-            cargo = rustVersion;
-            rustc = rustVersion;
-            cargo-auditable = pkgs.cargo-auditable;
+          craneLib = (crane.mkLib pkgs).overrideToolchain rustVersion;
+          sourceFilter = path: type: (builtins.match ".*/.sqlx/.*" path != null) || craneLib.filterCargoSources path type;
+          packageArguments = {
+            src = pkgs.lib.cleanSourceWith { 
+              src = craneLib.path ./apps/backend; 
+              filter = sourceFilter;
+            };
           };
-          backendPackage = rustPlatform.buildRustPackage {
-            pname = "backend";
-            version = "0.1.0";
-            src = ./apps/backend;
-            cargoLock.lockFile = ./apps/backend/Cargo.lock;
-            nativeBuildInputs = [
-              pkgs.pkgconfig
-              pkgs.openssl
-            ];
-            buildInputs = [
-              pkgs.openssl
-            ];
-          };
+          cargoArtifacts = craneLib.buildDepsOnly packageArguments;
+          backendPackage = craneLib.buildPackage (packageArguments // {
+            inherit cargoArtifacts;
+          });
         in
         {
           backend = pkgs.dockerTools.buildImage
             {
               name = "backend";
+              tag = "default";
               config = {
                 contents = [ pkgs.cacert ];
                 Cmd = [ "${backendPackage}/bin/backend" ];
                 Labels = {
-                  "org.opencontainers.image.source" = "https://github.com/Agares/infra";
+                  "org.opencontainers.image.source" = "https://github.com/ramonacat/infra";
                 };
               };
             };
           backend-migrations = pkgs.dockerTools.buildImage
             {
               name = "backend-migrations";
+              tag = "default";
               config = {
                 contents = [ pkgs.cacert ];
                 Cmd = [ "${backendPackage}/bin/migrate" ];
                 Labels = {
-                  "org.opencontainers.image.source" = "https://github.com/Agares/infra";
+                  "org.opencontainers.image.source" = "https://github.com/ramonacat/infra";
                 };
               };
             };
