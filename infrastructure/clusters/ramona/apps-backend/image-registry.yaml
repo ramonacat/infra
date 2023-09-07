@@ -5,7 +5,7 @@ metadata:
   name: apps-backend
   namespace: flux-system
 spec:
-  image: ghcr.io/ramonacatbackend
+  image: ghcr.io/ramonaca/tbackend
   interval: 1m0s
 
 ---
