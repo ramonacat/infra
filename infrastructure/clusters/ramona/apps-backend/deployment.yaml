@@ -21,16 +21,14 @@ spec:
             - name: secret-db-backend-app
               readOnly: true
               mountPath: /etc/secrets/db-backend-app
+            - name: secret-honeycomb-key
+              readOnly: true
+              mountPath: /etc/secrets/honeycomb-key
           resources:
             limits:
               cpu: '50m'
               memory: 256M
           env:
-            - name: HONEYCOMB_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: "honeycomb-key"
-                  key: "HONEYCOMB_KEY"
             - name: RUST_BACKTRACE
               value: "1"
       initContainers:

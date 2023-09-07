@@ -1,11 +1,11 @@
-use std::{collections::HashMap, env, sync::Arc};
+use std::{collections::HashMap, sync::Arc};
 
 use axum::{routing::get, Router};
 use opentelemetry::{runtime, sdk::Resource, KeyValue};
 use opentelemetry_otlp::WithExportConfig;
 use rand::{thread_rng, CryptoRng, Rng};
 use service_accounts::{ServiceAccount, ServiceAccountRepository, ServiceAccountToken};
-use tower_http::trace::{DefaultOnRequest, DefaultOnResponse, DefaultMakeSpan};
+use tower_http::trace::{DefaultMakeSpan, DefaultOnRequest, DefaultOnResponse};
 use tracing::Level;
 use tracing_subscriber::{filter::LevelFilter, prelude::*};
 use uuid::Uuid;
@@ -41,10 +41,8 @@ async fn main() {
     let mut metadata = HashMap::<String, String>::with_capacity(1);
     metadata.insert(
         "x-honeycomb-team".to_string(),
-        env::var("HONEYCOMB_KEY")
-            .expect("failed to read the HONEYCOMB_KEY")
-            .parse()
-            .unwrap(),
+        secrets::read("honeycomb-key", "HONEYCOMB_KEY")
+            .expect("Failed to read the honeycomb secret"),
     );
 
     let tracer = opentelemetry_otlp::new_pipeline()
