@@ -32,6 +32,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Run checks
+        run: nix flake check
+
       - name: Build backend docker image
         run: "./docker-build.sh backend  \"${{ env.REGISTRY }}/ramonacat/backend:${{ env.image_tag }}\""
 

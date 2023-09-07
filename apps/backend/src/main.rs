@@ -92,7 +92,7 @@ async fn main() {
                 tracing::info_span!("request");
 
                 tracing::info!("Received an HTTP request");
-                "Hello, World!"
+                "Hello World!"
             }),
         )
         .layer(
