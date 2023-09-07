@@ -5,7 +5,7 @@ metadata:
   name: apps-backend
   namespace: flux-system
 spec:
-  image: ghcr.io/agares/backend
+  image: ghcr.io/ramonacatbackend
   interval: 1m0s
 
 ---
@@ -15,6 +15,6 @@ metadata:
   name: apps-backend-migrations
   namespace: flux-system
 spec:
-  image: ghcr.io/agares/backend-migrations
+  image: ghcr.io/ramonacat/backend-migrations
   interval: 1m0s
 

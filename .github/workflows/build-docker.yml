@@ -33,16 +33,16 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build backend docker image
-        run: "./docker-build.sh backend  \"${{ env.REGISTRY }}/agares/backend:${{ env.image_tag }}\""
+        run: "./docker-build.sh backend  \"${{ env.REGISTRY }}/ramonacat/backend:${{ env.image_tag }}\""
 
       - name: Build backend-migrations docker image
-        run: "./docker-build.sh backend-migrations  \"${{ env.REGISTRY }}/agares/backend-migrations:${{ env.image_tag }}\""
+        run: "./docker-build.sh backend-migrations  \"${{ env.REGISTRY }}/ramonacat/backend-migrations:${{ env.image_tag }}\""
 
       - name: Print image tag
         run: echo ${{ env.image_tag }}
 
       - name: Publish backend docker image
-        run: docker push "${{ env.REGISTRY }}/agares/backend:${{ env.image_tag }}"
+        run: docker push "${{ env.REGISTRY }}/ramonacat/backend:${{ env.image_tag }}"
 
       - name: Publish backend-migrations docker image
-        run: docker push "${{ env.REGISTRY }}/agares/backend-migrations:${{ env.image_tag }}"
+        run: docker push "${{ env.REGISTRY }}/ramonacat/backend-migrations:${{ env.image_tag }}"

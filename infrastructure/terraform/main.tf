@@ -64,7 +64,7 @@ provider "flux" {
     cluster_ca_certificate = base64decode(vultr_kubernetes.k8s.cluster_ca_certificate)
   }
   git = {
-    url = "ssh://git@github.com/Agares/infra.git"
+    url = "ssh://git@github.com/ramonacat/infra.git"
     ssh = {
       username    = "git"
       private_key = tls_private_key.flux.private_key_pem
