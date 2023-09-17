@@ -122,3 +122,22 @@ impl ServiceAccountRepository {
         .await
     }
 }
+
+const ROOT_ACCOUNT_NAME: &str = "root";
+
+pub async fn initialize_root_account<TCryptoRng: CryptoRng + Rng>(
+    repository: Arc<ServiceAccountRepository>,
+    csprng: impl (FnOnce() -> TCryptoRng) + Send,
+) -> Result<(), sqlx::Error> {
+    let current_account = repository.find_by_name(ROOT_ACCOUNT_NAME).await?;
+
+    if current_account.is_none() {
+        let mut account = ServiceAccount::create(Uuid::new_v4(), ROOT_ACCOUNT_NAME.into());
+
+        account.add_token(ServiceAccountToken::create(Uuid::new_v4(), csprng));
+
+        repository.save(account).await?;
+    }
+
+    Ok(())
+}

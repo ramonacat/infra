@@ -135,6 +135,7 @@ dependencies = [
  "rand",
  "reqwest",
  "sqlx",
+ "thiserror",
  "time",
  "tokio",
  "tonic",
