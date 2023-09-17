@@ -40,6 +40,8 @@ fn main() {
         let cmd = Command::new("docker")
             .args([
                 "run",
+                "-v",
+                &format!("{}/docker/pginit:/docker-entrypoint-initdb.d/:ro", project_root.to_string_lossy()),
                 "-p",
                 "5432:5432",
                 "--name",
