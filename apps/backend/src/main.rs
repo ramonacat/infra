@@ -1,12 +1,17 @@
 #![deny(clippy::all, clippy::pedantic, clippy::nursery)]
 
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
-use ::tracing::Level;
-use axum::{routing::get, Router};
+use ::tracing::{info, Level, Span};
+use axum::{
+    body::{Body, BoxBody},
+    extract::MatchedPath,
+    http::{uri::Scheme, Request, Response},
+    routing::get,
+    Router,
+};
 use rand::thread_rng;
 use service_accounts::ServiceAccountRepository;
-use tower_http::trace::{DefaultMakeSpan, DefaultOnRequest, DefaultOnResponse};
 use tracing::setup_tracing_subscriber;
 
 use crate::service_accounts::initialize_root_account;
@@ -15,6 +20,42 @@ mod database;
 mod secrets;
 mod service_accounts;
 mod tracing;
+
+fn make_span(request: &Request<Body>) -> Span {
+    let matched_path = request
+        .extensions()
+        .get::<MatchedPath>()
+        .map_or("", MatchedPath::as_str);
+    let content_length: u64 = request
+        .headers()
+        .get("Content-Length")
+        .map_or(0, |x| x.to_str().unwrap_or("0").parse().unwrap_or(0));
+    let user_agent = request
+        .headers()
+        .get("User-Agent")
+        .map_or("", |x| x.to_str().unwrap_or(""));
+
+    ::tracing::span!(
+        Level::INFO,
+        "",
+        otel.name = format!("{} {}", request.method().as_str(), matched_path),
+        network.protocol.name = request.uri().scheme().map_or("http", Scheme::as_str),
+        http.request.body.size = content_length,
+        http.request.method = request.method().as_str(),
+        user_agent.original = user_agent
+    )
+}
+
+const fn on_request(_request: &Request<Body>, _span: &Span) {}
+
+fn on_response(response: &Response<BoxBody>, _latency: Duration, span: &Span) {
+    let content_length: u64 = response
+        .headers()
+        .get("Content-Length")
+        .map_or(0, |x| x.to_str().unwrap_or("0").parse().unwrap_or(0));
+    span.record("http.response.status_code", response.status().as_u16());
+    span.record("http.response.body.size", content_length);
+}
 
 #[tokio::main]
 async fn main() {
@@ -35,12 +76,18 @@ async fn main() {
     // build our application with a single route
     let app = Router::new()
         // TODO is it possible to set the base path?
-        .route("/api", get(|| async { "Hello World!" }))
+        .route(
+            "/api",
+            get(|| async {
+                info!("Hello world responded");
+                "Hello World!"
+            }),
+        )
         .layer(
             tower_http::trace::TraceLayer::new_for_http()
-                .make_span_with(DefaultMakeSpan::new().level(Level::INFO))
-                .on_request(DefaultOnRequest::new().level(Level::INFO))
-                .on_response(DefaultOnResponse::new().level(Level::INFO)),
+                .make_span_with(make_span)
+                .on_request(on_request)
+                .on_response(on_response),
         );
 
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
