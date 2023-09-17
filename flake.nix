@@ -13,7 +13,7 @@
       pkgs = import nixpkgs { inherit overlays; system = "x86_64-linux"; };
       rustVersion = pkgs.rust-bin.stable.latest.default;
       craneLib = (crane.mkLib pkgs).overrideToolchain rustVersion;
-      sourceFilter = path: type: (builtins.match ".*/.sqlx/.*" path != null) || craneLib.filterCargoSources path type;
+      sourceFilter = path: type: (builtins.match ".*/.sqlx/.*" path != null) || (builtins.match ".*/migrations/.*" path != null) || craneLib.filterCargoSources path type;
       packageArguments = {
         src = pkgs.lib.cleanSourceWith {
           src = craneLib.path ./apps/backend;

@@ -59,7 +59,7 @@ fn on_response(response: &Response<BoxBody>, _latency: Duration, span: &Span) {
 
 #[tokio::main]
 async fn main() {
-    setup_tracing_subscriber().expect("Failed to setup tracing");
+    setup_tracing_subscriber().expect("Failed to setup tracing!");
 
     let db_pool = database::connect(database::AccessLevel::App)
         .await
