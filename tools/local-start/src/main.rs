@@ -1,11 +1,36 @@
 use std::{
-    io::Read,
-    io::Write,
     path::PathBuf,
     process::{Command, Stdio},
 };
 
 use clap::Parser;
+use uuid::Uuid;
+
+use crate::state::{storage::StateFile, SavedContainer};
+
+mod state;
+
+struct PortDefinition {
+    host: u16,
+    container: u16,
+}
+
+struct EnvironmentVariable {
+    name: String,
+    value: String,
+}
+
+struct VolumeDefinition {
+    local_path: PathBuf,
+    container_path: String,
+}
+
+struct ContainerDefinition {
+    name: String,
+    ports: Vec<PortDefinition>,
+    environment: Vec<EnvironmentVariable>,
+    volumes: Vec<VolumeDefinition>,
+}
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -22,59 +47,86 @@ fn main() {
     let state_path = project_root.join(".state");
     std::fs::create_dir_all(state_path.clone()).unwrap();
 
-    let mut containers = std::fs::File::options()
-        .write(true)
-        .read(true)
-        .create(true)
-        .open(state_path.clone().join("containers"))
-        .unwrap();
+    let state_file_path = state_path.clone().join("containers.json");
+    let mut state_file = StateFile::new(state_file_path);
+    let containers = vec![ContainerDefinition {
+        name: "postgres".to_string(),
+        ports: vec![PortDefinition {
+            host: 5432,
+            container: 5432,
+        }],
+        environment: vec![
+            EnvironmentVariable {
+                name: "POSTGRES_PASSWORD".to_string(),
+                value: "postgres".to_string(),
+            },
+            EnvironmentVariable {
+                name: "POSTGRES_DB".to_string(),
+                value: "app".to_string(),
+            },
+        ],
+        volumes: vec![VolumeDefinition {
+            local_path: project_root.join("docker/pginit"),
+            container_path: "/docker-entrypoint-initdb.d/".to_string(),
+        }],
+    }];
 
-    let mut current_container_id = String::new();
-    containers
-        .read_to_string(&mut current_container_id)
-        .unwrap();
+    for container in &containers {
+        if let Some(saved_container) = state_file.state().container(&container.name) {
+            Command::new("docker")
+                .args(["start", saved_container.docker_id()])
+                .spawn()
+                .unwrap();
+        } else {
+            let mut args = vec!["run".to_string()];
 
-    if current_container_id.is_empty() {
-        println!("No container found. Creating a new one...");
+            for volume in &container.volumes {
+                let local_path = volume
+                    .local_path
+                    .to_str()
+                    .expect("Local volume path is not valid Unicode");
+                args.push("-v".to_string());
+                args.push(format!("{}:{}:ro", local_path, volume.container_path));
+            }
 
-        let cmd = Command::new("docker")
-            .args([
-                "run",
-                "-v",
-                &format!("{}/docker/pginit:/docker-entrypoint-initdb.d/:ro", project_root.to_string_lossy()),
-                "-p",
-                "5432:5432",
-                "--name",
-                "backend-pgsql",
-                "-e",
-                "POSTGRES_PASSWORD=postgres",
-                "-e",
-                "POSTGRES_DB=app",
-                "-d",
-                "postgres",
-            ])
-            .stdout(Stdio::piped())
-            .spawn()
-            .unwrap();
+            for port in &container.ports {
+                args.push("-p".to_string());
+                args.push(format!("{}:{}", port.container, port.host));
+            }
 
-        let o = cmd.wait_with_output().unwrap();
-        let stdout = String::from_utf8_lossy(&o.stdout);
+            for environment_variable in &container.environment {
+                args.push("-e".to_string());
+                args.push(format!(
+                    "{}={}",
+                    environment_variable.name, environment_variable.value
+                ));
+            }
 
-        current_container_id = stdout.trim().to_string();
+            args.push("--name".to_string());
+            args.push(format!("{}-{}", container.name, Uuid::new_v4()));
 
-        write!(containers, "{}", current_container_id).unwrap();
-        containers.flush().unwrap();
+            args.push("-d".to_string());
 
-        println!("Container created");
-    } else {
-        println!("Container already exists with ID: {}", current_container_id);
+            let cmd = Command::new("docker")
+                .args(args)
+                .stdout(Stdio::piped())
+                .spawn()
+                .expect("Failed to execute docker run");
 
-        Command::new("docker")
-            .args(["start", &current_container_id])
-            .spawn()
-            .unwrap();
+            let output = cmd
+                .wait_with_output()
+                .expect("Failed to wait for docker run");
+            let stdout =
+                String::from_utf8(output.stdout).expect("docker run output was not valid unicode");
 
-        println!("Container started");
+            state_file
+                .state_mut()
+                .add_container(
+                    container.name.clone(),
+                    SavedContainer::from_docker_id(stdout.trim().to_string()),
+                )
+                .expect("Failed to save container state");
+        }
     }
 
     Command::new("cargo")
