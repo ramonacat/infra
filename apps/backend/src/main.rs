@@ -59,6 +59,11 @@ fn on_response(response: &Response<BoxBody>, _latency: Duration, span: &Span) {
 
 #[tokio::main]
 async fn main() {
+    #[cfg(debug_assertions)]
+    {
+        dotenvy::dotenv().expect("Failed to load .env");
+    }
+
     setup_tracing_subscriber().expect("Failed to setup tracing!");
 
     let db_pool = database::connect(database::AccessLevel::App)

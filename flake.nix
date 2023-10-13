@@ -30,10 +30,6 @@
       devShells.x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.mkShell {
         shellHook = ''
           cargo install sqlx-cli
-
-          pushd tools/local-start
-          cargo run ../../
-          popd
         '';
         packages = with nixpkgs.legacyPackages.x86_64-linux; [
           terraform

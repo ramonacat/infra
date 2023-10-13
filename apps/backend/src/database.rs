@@ -17,11 +17,17 @@ pub async fn connect(access_level: AccessLevel) -> Result<sqlx::Pool<sqlx::Postg
 
     let username = secrets::read(secret_name, "username").expect("Failed to read username");
     let password = secrets::read(secret_name, "password").expect("Failed to read password");
+    let mut hostname = "db-backend-rw".to_string();
+
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(new_hostname) = std::env::var("DATABASE_HOST") {
+            hostname = new_hostname;
+        }
+    }
 
     PgPoolOptions::new()
         .max_connections(50) // TODO: tune
-        .connect(&format!(
-            "postgres://{username}:{password}@db-backend-rw/app"
-        ))
+        .connect(&format!("postgres://{username}:{password}@{hostname}/app"))
         .await
 }
