@@ -19,6 +19,11 @@ opentelemetry-otlp = { version = "0.13.0", features=["tokio", "http-proto", "req
 tracing-subscriber = { version = "0.3.17", features=["env-filter"] }
 tonic = "0.9.2"
 reqwest = { version = "0.11.18", features = ["tokio-rustls", "rustls-tls-webpki-roots"], default-features = false }
-tower-http = { version = "0.4.4", features = ["tokio", "trace"] }
+tower-http = { version = "0.4.4", features = ["fs", "trace"] }
 thiserror = "1.0.48"
 dotenvy = "0.15.7"
+lightningcss = { version = "1.0.0-alpha.49", features = ["bundler", "browserslist", "visitor"] }
+askama = { version = "0.12.1", features = ["with-axum"] }
+askama_axum = "0.3.0"
+serde = { version = "1.0.189", features = ["derive"] }
+serde_derive = "1.0.189"

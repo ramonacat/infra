@@ -4,7 +4,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - docker/pginit:/docker-entrypoint-initdb.d/:ro
+      - ./docker/pginit:/docker-entrypoint-initdb.d/:ro
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=app

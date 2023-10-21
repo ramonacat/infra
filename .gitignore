@@ -4,3 +4,5 @@
 target/
 result
 .state/
+apps/backend/dist/
+apps/backend/node_modules/
