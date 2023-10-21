@@ -13,7 +13,10 @@
       pkgs = import nixpkgs { inherit overlays; system = "x86_64-linux"; };
       rustVersion = pkgs.rust-bin.stable.latest.default;
       craneLib = (crane.mkLib pkgs).overrideToolchain rustVersion;
-      sourceFilter = path: type: (builtins.match ".*/.sqlx/.*" path != null) || (builtins.match ".*/migrations/.*" path != null) || craneLib.filterCargoSources path type;
+      sourceFilter = path: type: (builtins.match ".*/.sqlx/.*" path != null) 
+      || (builtins.match ".*/migrations/.*" path != null) 
+      || (builtins.match ".*/templates/.*" path != null) 
+      || craneLib.filterCargoSources path type;
       packageArguments = {
         src = pkgs.lib.cleanSourceWith {
           src = craneLib.path ./apps/backend;
@@ -24,6 +27,11 @@
       backendPackage = craneLib.buildPackage (packageArguments // {
         inherit cargoArtifacts;
       });
+      frontendPackage = pkgs.buildNpmPackage {
+        name = "frontend-with-deps";
+        src = ./apps/backend;
+        npmDepsHash="sha256-qcMvDwPwxHUbT1q84pCjsdoMcyA6BEuBOmfvz9E2Uus=";
+      };
     in
     {
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
@@ -36,6 +44,7 @@
           fluxcd
           pkgconfig
           openssl
+          nodejs
           (pkgs.rust-bin.stable.latest.default.override {
             extensions = [ "rust-src" ];
           })
@@ -55,7 +64,7 @@
               tag = "default";
               config = {
                 contents = [ pkgs.cacert ];
-                Cmd = [ "${backendPackage}/bin/backend" ];
+                Cmd = [ "${backendPackage}/bin/backend" "${frontendPackage}/dist/" ];
                 Labels = {
                   "org.opencontainers.image.source" = "https://github.com/ramonacat/infra";
                 };

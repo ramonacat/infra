@@ -21,6 +21,8 @@ mod secrets;
 mod service_accounts;
 mod tracing;
 
+mod blog;
+
 fn make_span(request: &Request<Body>) -> Span {
     let matched_path = request
         .extensions()
@@ -78,8 +80,15 @@ async fn main() {
     .await
     .expect("Failed to init root account");
 
+    let asset_path = std::env::args()
+        .nth(1)
+        .unwrap_or_else(|| "dist".to_string());
+
+    let assets_service = tower_http::services::ServeDir::new(asset_path);
+
     // build our application with a single route
     let app = Router::new()
+        .route("/", get(blog::route_main))
         // TODO is it possible to set the base path?
         .route(
             "/api",
@@ -88,6 +97,7 @@ async fn main() {
                 "Hello World!"
             }),
         )
+        .fallback_service(assets_service)
         .layer(
             tower_http::trace::TraceLayer::new_for_http()
                 .make_span_with(make_span)
