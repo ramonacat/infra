@@ -64,7 +64,7 @@
               tag = "default";
               config = {
                 contents = [ pkgs.cacert ];
-                Cmd = [ "${backendPackage}/bin/backend" "${frontendPackage}/dist/" ];
+                Cmd = [ "${backendPackage}/bin/backend" "${frontendPackage}/lib/node_modules/frontend/dist/" ];
                 Labels = {
                   "org.opencontainers.image.source" = "https://github.com/ramonacat/infra";
                 };
