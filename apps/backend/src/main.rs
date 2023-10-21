@@ -24,10 +24,11 @@ mod tracing;
 mod blog;
 
 fn make_span(request: &Request<Body>) -> Span {
+    let request_uri = request.uri().to_string();
     let matched_path = request
         .extensions()
         .get::<MatchedPath>()
-        .map_or("", MatchedPath::as_str);
+        .map_or_else(|| &request_uri, MatchedPath::as_str);
     let content_length: u64 = request
         .headers()
         .get("Content-Length")
