@@ -7,7 +7,7 @@
     --colour-background-alternate: #332D30;
     --colour-text: #111;
     --colour-accent: #ff1885;
-    --colour-link: #17DEFF;
+    --colour-link: #0D8094;
 
     --font-body: Lato, sans-serif;
     --font-header: 'Anybody Variable', sans-serif;
@@ -93,6 +93,8 @@ figure {
 
 .page-header {
     background-color: var(--colour-background-alternate);
+    --colour-link: #17DEFF;
+    
     width: 100%;
    
     display: flex;
@@ -145,7 +147,7 @@ figure {
 
     display: grid;
     column-gap: 3rem;
-    grid-template-columns: 1fr minmax(75ex, 100ex) 1fr;
+    grid-template-columns: auto minmax(75ex, 100ex);
 
     article {
         grid-row: 1;
@@ -155,13 +157,11 @@ figure {
 
     aside {
         grid-row: 1;
+        grid-column: 1;
 
-        &.-left {
-            grid-column: 1;
-        }
-
-        &.-right {
-            grid-column: 3;
+        > * {
+            position: sticky;
+            top: 1rem;
         }
 
         figure, img {
