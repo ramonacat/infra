@@ -48,6 +48,7 @@
           (pkgs.rust-bin.stable.latest.default.override {
             extensions = [ "rust-src" ];
           })
+          postgresql
         ];
       };
       checks.x86_64-linux = {

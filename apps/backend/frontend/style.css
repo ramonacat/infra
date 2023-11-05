@@ -149,7 +149,7 @@ figure {
     column-gap: 3rem;
     grid-template-columns: auto minmax(75ex, 100ex);
 
-    article {
+    .main {
         grid-row: 1;
         grid-column: 2;
         margin: 0 auto;
