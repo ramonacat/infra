@@ -2,12 +2,12 @@
 
 use std::{sync::Arc, time::Duration};
 
-use ::tracing::{info, Level, Span};
+use ::tracing::{Level, Span};
 use axum::{
     body::{Body, BoxBody},
     extract::MatchedPath,
     http::{uri::Scheme, Request, Response},
-    routing::get,
+    routing::{get, post},
     Router,
 };
 use rand::thread_rng;
@@ -74,12 +74,10 @@ async fn main() {
         .expect("Database connection failed");
     let db_pool = Arc::new(db_pool);
 
-    initialize_root_account(
-        Arc::new(ServiceAccountRepository::new(db_pool.clone())),
-        thread_rng,
-    )
-    .await
-    .expect("Failed to init root account");
+    let service_account_repository = Arc::new(ServiceAccountRepository::new(db_pool.clone()));
+    initialize_root_account(service_account_repository.clone(), thread_rng)
+        .await
+        .expect("Failed to init root account");
 
     let asset_path = std::env::args()
         .nth(1)
@@ -87,17 +85,23 @@ async fn main() {
 
     let assets_service = tower_http::services::ServeDir::new(asset_path);
 
-    // build our application with a single route
-    let app = Router::new()
+    let blog_repository = Arc::new(blog::posts::Repository::new(db_pool.clone()));
+    let blog = blog::Blog::new(db_pool.clone());
+    let blog = Arc::new(blog);
+
+    let api = Router::new()
+        .route("/posts", post(blog::route_api_post_posts))
+        .layer(axum::middleware::from_fn_with_state(
+            service_account_repository,
+            service_accounts::middleware,
+        ))
+        .with_state(blog_repository.clone());
+
+    let application = Router::new()
         .route("/", get(blog::route_main))
-        // TODO is it possible to set the base path?
-        .route(
-            "/api",
-            get(|| async {
-                info!("Hello world responded");
-                "Hello World!"
-            }),
-        )
+        .route("/posts/:id", get(blog::route_posts_id))
+        .with_state(blog)
+        .nest("/api", api)
         .fallback_service(assets_service)
         .layer(
             tower_http::trace::TraceLayer::new_for_http()
@@ -107,7 +111,7 @@ async fn main() {
         );
 
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
-        .serve(app.into_make_service())
+        .serve(application.into_make_service())
         .await
         .unwrap();
 }

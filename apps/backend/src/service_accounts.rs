@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use axum::{extract::State, http::Request, middleware::Next};
 use rand::{distributions::Alphanumeric, CryptoRng, Rng};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
@@ -78,6 +79,29 @@ impl ServiceAccountRepository {
         }))
     }
 
+    pub async fn find_by_token(
+        &self,
+        token: impl Into<&str> + Send,
+    ) -> Result<Option<ServiceAccount>, sqlx::Error> {
+        let token: &str = token.into();
+
+        let account = sqlx::query!("SELECT id, name FROM service_accounts WHERE id = (SELECT service_account FROM service_account_tokens WHERE content=$1)", token)
+            .fetch_optional(self.db_pool.as_ref())
+            .await?;
+
+        let Some(account) = account else {
+            return Ok(None);
+        };
+
+        let tokens = self.find_tokens_for_account(account.id).await?;
+
+        Ok(Some(ServiceAccount {
+            id: account.id,
+            name: account.name,
+            tokens,
+        }))
+    }
+
     pub async fn save(&self, account: ServiceAccount) -> Result<(), sqlx::Error> {
         sqlx::query!("INSERT INTO service_accounts (id, name) VALUES($1, $2) ON CONFLICT(id) DO UPDATE SET name = EXCLUDED.name", account.id, account.name)
             .execute(self.db_pool.as_ref())
@@ -140,4 +164,23 @@ pub async fn initialize_root_account<TCryptoRng: CryptoRng + Rng>(
     }
 
     Ok(())
+}
+
+pub async fn middleware<B: Sync + Send>(
+    State(repository): State<Arc<ServiceAccountRepository>>,
+    request: Request<B>,
+    next: Next<B>,
+) -> Result<axum::response::Response, axum::http::StatusCode> {
+    if let Some(token) = request.headers().get("X-Token") {
+        if repository
+            .find_by_token(token.to_str().unwrap())
+            .await
+            .unwrap()
+            .is_some()
+        {
+            return Ok(next.run(request).await);
+        }
+    }
+
+    Err(axum::http::StatusCode::UNAUTHORIZED)
 }

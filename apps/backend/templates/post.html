@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+    <aside>
+        <nav class="table-of-contents">
+            {{ post.toc|safe }}
+        </nav>
+    </aside>
+    <section class="main">
+        <article>
+            <h1>{{ post.title }}</h1>
+            {{ post.content|safe }}
+        </article>
+    </section>
+{% endblock %}
