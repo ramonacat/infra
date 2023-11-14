@@ -38,6 +38,7 @@
       devShells.x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.mkShell {
         shellHook = ''
           cargo install sqlx-cli
+          cargo install cargo-tarpaulin
         '';
         packages = with nixpkgs.legacyPackages.x86_64-linux; [
           terraform
