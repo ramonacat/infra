@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ghcr.io/ramonacat/backend:main-1699206320 # {"$imagepolicy": "flux-system:apps-backend"}
+          image: ghcr.io/ramonacat/backend:main-1699999789 # {"$imagepolicy": "flux-system:apps-backend"}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: secret-db-backend-app
